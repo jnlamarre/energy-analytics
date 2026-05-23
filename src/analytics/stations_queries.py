@@ -1,4 +1,7 @@
-from ..utils.database import get_connection
+try:
+    from ..utils.database import get_connection
+except ImportError:
+    from utils.database import get_connection
 
 
 def show_stations_stats(db_path: str = '../data/energy-analytics.db') -> None:

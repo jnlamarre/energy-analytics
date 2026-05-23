@@ -1,27 +1,34 @@
-import sys
-sys.path.append('..')
+#!/usr/bin/env python3
+"""
+OOP-based Fuel Stations Data Pipeline
 
-from src.stations.fetcher import fetch_stations_data
-from src.stations.processor import save_stations_data
-from src.stations.storage import load_stations_to_database
+This script demonstrates the new object-oriented pipeline architecture.
+Fetches fuel station data and loads it into DuckDB using pipeline classes.
+"""
+
+import sys
+import os
+
+# Add src directory to Python path for imports
+sys.path.append(os.path.dirname(__file__))
+
+from pipelines.stations_pipeline import StationsPipeline
 
 
 def main():
-    """Main pipeline for fuel prices data"""
-    try:
-        # Fetch data from API
-        data = fetch_stations_data()
-        
-        # Save to JSON
-        save_stations_data(data)
-        
-        # Load to database
-        load_stations_to_database()
-        
-        print("\nStations pipeline completed successfully!")
-        
-    except Exception as e:
-        print(f"Error in pipeline: {e}")
+    """
+    Run the stations data pipeline using OOP approach.
+    """
+    print("=== Fuel Stations Data Pipeline (OOP) ===")
+    
+    # Create pipeline instance
+    pipeline = StationsPipeline()
+    
+    # Run the complete pipeline
+    # This will: fetch -> process -> store -> load to database
+    pipeline.run_full_pipeline()
+    
+    print("=== Pipeline completed successfully! ===")
 
 
 if __name__ == "__main__":

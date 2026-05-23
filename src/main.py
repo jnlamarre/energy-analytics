@@ -1,45 +1,46 @@
+#!/usr/bin/env python3
+"""
+OOP-based Main Pipeline Runner
+
+Unified entry point for all data pipelines using object-oriented architecture.
+Runs both consumption and stations pipelines sequentially.
+"""
+
 import sys
 import os
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from utils.config import load_config
-from consumption.fetcher import fetch_consumption_data
-from consumption.processor import save_consumption_data
-from consumption.storage import load_consumption_to_database
-from stations.fetcher import fetch_stations_data
-from stations.processor import save_stations_data
-from stations.storage import load_stations_to_database
+# Add src directory to Python path for imports
+sys.path.append(os.path.dirname(__file__))
+
+from pipelines.consumption_pipeline import ConsumptionPipeline
+from pipelines.stations_pipeline import StationsPipeline
 
 
 def main():
-    """Main entry point that processes all configured datasets."""
-    print("Starting data pipeline processing...")
+    """
+    Run all data pipelines using OOP approach.
+    """
+    print("=== Energy Analytics Data Pipelines (OOP) ===")
+    print("Running all pipelines sequentially...\n")
     
-    # Load configuration
-    configurations = load_config()
-    
-    for config in configurations:
-        print(f"\nProcessing {config['nom_table']}...")
+    try:
+        # Run consumption pipeline
+        print("1. Starting Consumption Pipeline...")
+        consumption_pipeline = ConsumptionPipeline()
+        consumption_pipeline.run_full_pipeline()
+        print("✅ Consumption pipeline completed\n")
         
-        try:
-            # Fetch data based on API type
-            if config["type_api"] == "economie_gouv":
-                data = fetch_stations_data()
-                save_stations_data(data)
-                load_stations_to_database()
-                
-            elif config["type_api"] == "data_gouv":
-                data = fetch_consumption_data()
-                save_consumption_data(data)
-                load_consumption_to_database()
-                
-            else:
-                raise ValueError(f"Unknown API type: {config['type_api']}")
-                
-            print(f"✅ Successfully processed {config['nom_table']}")
-            
-        except Exception as e:
-            print(f"❌ Error processing {config['nom_table']}: {e}")
+        # Run stations pipeline
+        print("2. Starting Stations Pipeline...")
+        stations_pipeline = StationsPipeline()
+        stations_pipeline.run_full_pipeline()
+        print("✅ Stations pipeline completed\n")
+        
+        print("=== All pipelines completed successfully! ===")
+        
+    except Exception as e:
+        print(f"❌ Pipeline execution failed: {e}")
+        sys.exit(1)
 
 
 if __name__ == "__main__":

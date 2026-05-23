@@ -1,6 +1,6 @@
 # Energy Analytics
 
-French energy data analytics project with modular pipelines for real-time consumption and fuel price data.
+French energy data analytics project with object-oriented pipelines for real-time consumption and fuel price data.
 
 ## Quick Start
 
@@ -8,31 +8,44 @@ French energy data analytics project with modular pipelines for real-time consum
 # Install dependencies
 uv install
 
-# Run all pipelines (from src directory)
+# Run all OOP pipelines (from src directory)
 cd src
 python main.py
 
-# Or run individual pipelines
+# Or run individual OOP pipelines
 cd src
-python run_consumption_pipeline.py  # Energy consumption data
-python run_stations_pipeline.py     # Fuel station prices
+python run_consumption_pipeline.py  # ConsumptionPipeline class
+python run_stations_pipeline.py     # StationsPipeline class
 python run_analytics.py             # Query and analyze data
 ```
 
 ## Project Structure
 
-Modular architecture with clean separation of concerns:
+Object-oriented architecture with inheritance and polymorphism:
 
 ```
 src/
-├── main.py                    # Unified entry point
-├── run_*.py                  # Individual pipeline runners
-├── utils/                    # Common functionality
-├── consumption/              # Energy consumption pipeline
-├── stations/                 # Fuel stations pipeline
-├── analytics/                # Data analysis queries
-└── sql/                      # Database schemas
+├── main.py                         # Unified OOP entry point
+├── run_*.py                       # Individual OOP pipeline runners
+├── pipelines/                     # OOP pipeline implementations
+│   ├── consumption_pipeline.py   # ConsumptionPipeline class
+│   └── stations_pipeline.py      # StationsPipeline class
+├── utils/                         # Base classes and utilities
+│   ├── configuration_classes.py  # BaseConfiguration, ConfigurationManager
+│   ├── pipeline_classes.py       # BasePipeline, BaseProcessor, BaseStorage
+│   ├── config.py                 # Legacy compatibility functions
+│   └── *.py                      # Other utilities (API, database, file handling)
+├── analytics/                     # Data analysis queries
+└── sql/                          # Database schemas
 ```
+
+## OOP Features
+
+- **Inheritance**: `BaseConfiguration` → `DataGouvConfiguration`/`EconomieGouvConfiguration`
+- **Polymorphism**: Same pipeline interface for different data sources
+- **Factory Pattern**: `BaseConfiguration.create_from_dict()` for object creation
+- **Manager Pattern**: `ConfigurationManager` for centralized config operations
+- **Abstract Classes**: Clear interfaces for extensibility
 
 ## Data Sources
 

@@ -1,27 +1,34 @@
-import sys
-sys.path.append('..')
+#!/usr/bin/env python3
+"""
+OOP-based Energy Consumption Data Pipeline
 
-from src.consumption.fetcher import fetch_consumption_data
-from src.consumption.processor import save_consumption_data
-from src.consumption.storage import load_consumption_to_database
+This script demonstrates the new object-oriented pipeline architecture.
+Fetches energy consumption data and loads it into DuckDB using pipeline classes.
+"""
+
+import sys
+import os
+
+# Add src directory to Python path for imports
+sys.path.append(os.path.dirname(__file__))
+
+from pipelines.consumption_pipeline import ConsumptionPipeline
 
 
 def main():
-    """Main pipeline for energy consumption data"""
-    try:
-        # Fetch data from API
-        data = fetch_consumption_data()
-        
-        # Save to JSON
-        save_consumption_data(data)
-        
-        # Load to database
-        load_consumption_to_database()
-        
-        print("\nConsumption pipeline completed successfully!")
-        
-    except Exception as e:
-        print(f"Error in pipeline: {e}")
+    """
+    Run the consumption data pipeline using OOP approach.
+    """
+    print("=== Energy Consumption Data Pipeline (OOP) ===")
+    
+    # Create pipeline instance
+    pipeline = ConsumptionPipeline()
+    
+    # Run the complete pipeline
+    # This will: fetch -> process -> store -> load to database
+    pipeline.run_full_pipeline()
+    
+    print("=== Pipeline completed successfully! ===")
 
 
 if __name__ == "__main__":
