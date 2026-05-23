@@ -53,3 +53,21 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.temp
+
+# Claude Code specific
+.claude_history
+.claude_sessions
+
+# UV specific  
+.venv/
+.env
+
+# Jupyter notebooks (if added later)
+*.ipynb_checkpoints/
+.ipynb_checkpoints/
+
+# Data analysis outputs
+*.csv
+*.xlsx
+plots/
+outputs/
