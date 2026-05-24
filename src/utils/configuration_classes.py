@@ -25,6 +25,21 @@ class DataGouvConfiguration:
             Complete API URL for data.gouv.fr tabular API
         """
         return f'https://tabular-api.data.gouv.fr/api/resources/{self.dataset}/data/'
+    
+    @property
+    def target_file_path(self) -> str:
+        """
+        Get the target file path adjusted for current working directory.
+        
+        Returns:
+            Adjusted target file path
+        """
+        if os.path.exists('data') and os.path.exists('config.json'):
+            # Running from project root (has both data and config.json)
+            return self.target_file.replace('../', '')
+        else:
+            # Running from src/ directory
+            return self.target_file
 
 
 @dataclass
@@ -55,6 +70,21 @@ class EconomieGouvConfiguration:
             return f"{base_url}?select={select_param}&limit={{step}}&offset={{offset}}"
         else:
             return f"{base_url}?limit={{step}}&offset={{offset}}"
+    
+    @property
+    def target_file_path(self) -> str:
+        """
+        Get the target file path adjusted for current working directory.
+        
+        Returns:
+            Adjusted target file path
+        """
+        if os.path.exists('data') and os.path.exists('config.json'):
+            # Running from project root (has both data and config.json)
+            return self.target_file.replace('../', '')
+        else:
+            # Running from src/ directory
+            return self.target_file
 
 
 # Type alias for configuration objects (Python 3.10+ syntax)

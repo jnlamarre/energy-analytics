@@ -195,7 +195,7 @@ class ConsumptionPipeline(BasePipeline):
         """
         self.processor.save_to_file(data, file_path)
     
-    def load_to_database(self, db_path: str = '../data/energy-analytics.db') -> None:
+    def load_to_database(self, db_path: str = 'data/energy-analytics.db') -> None:
         """
         Load consumption data into database.
         

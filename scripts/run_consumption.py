@@ -20,19 +20,27 @@ def main() -> None:
     """
     Run the consumption data pipeline using OOP approach.
     """
-    # Setup pipeline logger
-    logger = get_pipeline_logger('consumption')
-    
-    logger.info("=== Energy Consumption Data Pipeline (OOP) ===")
-    
-    # Create pipeline instance with logger
-    pipeline = ConsumptionPipeline(logger)
-    
-    # Run the complete pipeline
-    # This will: fetch -> process -> store -> load to database
-    pipeline.run_full_pipeline()
-    
-    logger.info("=== Pipeline completed successfully! ===")
+    try:
+        # Setup pipeline logger
+        logger = get_pipeline_logger('consumption')
+        
+        logger.info("=== Energy Consumption Data Pipeline (OOP) ===")
+        print("Starting consumption pipeline...")
+        
+        # Create pipeline instance with logger
+        pipeline = ConsumptionPipeline(logger)
+        
+        # Run the complete pipeline
+        # This will: fetch -> process -> store -> load to database
+        pipeline.run_full_pipeline()
+        
+        logger.info("=== Pipeline completed successfully! ===")
+        print("Pipeline completed successfully!")
+        
+    except Exception as e:
+        print(f"Pipeline failed: {e}")
+        import traceback
+        traceback.print_exc()
 
 
 if __name__ == "__main__":

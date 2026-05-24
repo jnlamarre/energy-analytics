@@ -4,7 +4,7 @@ except ImportError:
     from utils.database import get_connection, DuckDBConnection
 
 
-def show_consumption_stats(db_path: str = '../data/energy-analytics.db') -> None:
+def show_consumption_stats(db_path: str = 'data/energy-analytics.db') -> None:
     """Display comprehensive consumption data statistics."""
     with DuckDBConnection(db_path) as conn:
         print("\n" + "="*50)

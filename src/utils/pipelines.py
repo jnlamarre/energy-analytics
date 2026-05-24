@@ -58,7 +58,7 @@ class BasePipeline(ABC):
         pass
     
     @abstractmethod
-    def load_to_database(self, db_path: str = '../data/energy-analytics.db') -> None:
+    def load_to_database(self, db_path: str = 'data/energy-analytics.db') -> None:
         """
         Load data from JSON file into database.
         
@@ -67,7 +67,7 @@ class BasePipeline(ABC):
         """
         pass
     
-    def run_full_pipeline(self, db_path: str = '../data/energy-analytics.db', **fetch_kwargs) -> None:
+    def run_full_pipeline(self, db_path: str = 'data/energy-analytics.db', **fetch_kwargs) -> None:
         """
         Execute the complete pipeline: fetch -> process -> store -> load to DB.
         
@@ -133,7 +133,7 @@ class BaseProcessor:
             config = self.config_manager.get_configuration_by_table(self.table_name)
             if not config:
                 raise ValueError(f"No configuration found for {self.table_name} table")
-            file_path = config.target_file
+            file_path = config.target_file_path
             
         self.logger.info(f"Saving {self.table_name} data to JSON file...")
         self.save_json(data, file_path)
@@ -193,7 +193,7 @@ class BaseStorage:
         """
         pass
     
-    def load_to_database(self, db_path: str = '../data/energy-analytics.db') -> None:
+    def load_to_database(self, db_path: str = 'data/energy-analytics.db') -> None:
         """
         Load data from JSON file into database.
         
@@ -211,7 +211,7 @@ class BaseStorage:
             if not config:
                 raise ValueError(f"No configuration found for {self.table_name} table")
             
-            data_file_path = config.target_file
+            data_file_path = config.target_file_path
             
             # Insert data
             record_count = self.insert_data(conn, data_file_path)

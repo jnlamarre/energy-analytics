@@ -91,23 +91,37 @@ def get_pipeline_logger(pipeline_name: str, log_file: str | None = None) -> logg
         Configured logger instance for the pipeline
     """
     if log_file is None:
-        # Default log file in logs directory
-        log_file = f"../logs/{pipeline_name}.log"
+        # Auto-detect if we're running from src/ directory or project root
+        if os.path.exists('data') and os.path.exists('config.json'):
+            # Running from project root (has both data and config.json)
+            log_file = f"logs/{pipeline_name}.log"
+        else:
+            # Running from src/ or another subdirectory
+            log_file = f"../logs/{pipeline_name}.log"
     
     logger_name = f"{pipeline_name}_pipeline"
     return setup_advanced_logging(logger_name, log_file)
 
 
-def get_main_logger(log_file: str = "../logs/main.log") -> logging.Logger:
+def get_main_logger(log_file: str | None = None) -> logging.Logger:
     """
     Get the main application logger for coordinating all pipelines.
     
     Args:
-        log_file: Path to the main log file
+        log_file: Optional custom path to the main log file
         
     Returns:
         Configured main logger instance
     """
+    if log_file is None:
+        # Auto-detect if we're running from src/ directory or project root
+        if os.path.exists('data') and os.path.exists('config.json'):
+            # Running from project root (has both data and config.json)
+            log_file = "logs/main.log"
+        else:
+            # Running from src/ or another subdirectory
+            log_file = "../logs/main.log"
+    
     return setup_advanced_logging("main_pipeline", log_file)
 
 

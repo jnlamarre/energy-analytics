@@ -4,7 +4,7 @@ except ImportError:
     from utils.database import get_connection, DuckDBConnection
 
 
-def show_stations_stats(db_path: str = '../data/energy-analytics.db') -> None:
+def show_stations_stats(db_path: str = 'data/energy-analytics.db') -> None:
     """Display comprehensive stations data statistics."""
     with DuckDBConnection(db_path) as conn:
         print("\n" + "="*50)
@@ -82,7 +82,7 @@ def show_stations_stats(db_path: str = '../data/energy-analytics.db') -> None:
             print(f"Dept {row[0]}: {row[1]} stations, avg diesel €{row[2]:.3f}")
 
 
-def show_tables_overview(db_path: str = '../data/energy-analytics.db') -> None:
+def show_tables_overview(db_path: str = 'data/energy-analytics.db') -> None:
     """Display overview of all tables in the database."""
     with DuckDBConnection(db_path) as conn:
         print("=== AVAILABLE TABLES ===")
