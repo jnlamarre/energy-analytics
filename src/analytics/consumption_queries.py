@@ -1,14 +1,12 @@
 try:
-    from ..utils.database import get_connection
+    from ..utils.database import get_connection, DuckDBConnection
 except ImportError:
-    from utils.database import get_connection
+    from utils.database import get_connection, DuckDBConnection
 
 
 def show_consumption_stats(db_path: str = '../data/energy-analytics.db') -> None:
     """Display comprehensive consumption data statistics."""
-    conn = get_connection(db_path)
-    
-    try:
+    with DuckDBConnection(db_path) as conn:
         print("\n" + "="*50)
         print("CONSUMPTION DATA ANALYSIS")
         print("="*50)
@@ -45,6 +43,3 @@ def show_consumption_stats(db_path: str = '../data/energy-analytics.db') -> None
         print(f"Max: {stats[1]} MW") 
         print(f"Avg: {stats[2]:.0f} MW")
         print(f"Records with data: {stats[3]}")
-        
-    finally:
-        conn.close()

@@ -90,6 +90,7 @@ class ConsumptionStorage(BaseStorage):
         conn.execute(f"""
             INSERT INTO consumption
             SELECT 
+                "__id"::INTEGER as id,
                 CAST(Date AS DATE) as date,
                 Heure::STRING as time_slot,
                 flag_ignore::BOOLEAN as flag_ignore,

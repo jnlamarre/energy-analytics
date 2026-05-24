@@ -150,14 +150,16 @@ class BaseStorage:
         self.table_name = table_name
         
         try:
-            from ..utils.database import get_connection
+            from ..utils.database import get_connection, DuckDBConnection
             from ..utils.configuration_classes import ConfigurationManager
             self.get_connection = get_connection
+            self.DuckDBConnection = DuckDBConnection
             self.config_manager = ConfigurationManager
         except ImportError:
-            from utils.database import get_connection
+            from utils.database import get_connection, DuckDBConnection
             from utils.configuration_classes import ConfigurationManager
             self.get_connection = get_connection
+            self.DuckDBConnection = DuckDBConnection
             self.config_manager = ConfigurationManager
     
     @abstractmethod
@@ -192,9 +194,8 @@ class BaseStorage:
             db_path: Path to database file
         """
         print(f"Loading {self.table_name} data into database...")
-        conn = self.get_connection(db_path)
         
-        try:
+        with self.DuckDBConnection(db_path) as conn:
             # Create table
             self.create_table(conn)
             
@@ -208,8 +209,5 @@ class BaseStorage:
             # Insert data
             record_count = self.insert_data(conn, data_file_path)
             print(f"Successfully loaded {record_count} records")
-            
-        finally:
-            conn.close()
             
         print("Database loading completed!")

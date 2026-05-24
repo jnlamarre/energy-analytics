@@ -1,11 +1,10 @@
-from typing import List, Dict, Optional, Tuple
+from typing import List, Dict, Optional
 import duckdb
 
 try:
     from ..utils.pipeline_classes import BasePipeline, BaseProcessor, BaseStorage
     from ..utils.api_client import fetch_paginated_api
     from ..utils.configuration_classes import ConfigurationManager
-    from ..utils.file_handler import load_json
 except ImportError:
     import sys
     import os
@@ -13,7 +12,6 @@ except ImportError:
     from utils.pipeline_classes import BasePipeline, BaseProcessor, BaseStorage
     from utils.api_client import fetch_paginated_api
     from utils.configuration_classes import ConfigurationManager
-    from utils.file_handler import load_json
 
 
 class StationsProcessor(BaseProcessor):
@@ -23,24 +21,6 @@ class StationsProcessor(BaseProcessor):
     
     def __init__(self):
         super().__init__('stations')
-    
-    def process_coordinates(self, latitude: str, longitude: str) -> Tuple[Optional[float], Optional[float]]:
-        """
-        Convert coordinate strings to float values with proper scaling.
-        
-        Args:
-            latitude: Latitude as string
-            longitude: Longitude as string
-        
-        Returns:
-            Tuple of (lat, lon) as floats, or (None, None) if conversion fails
-        """
-        try:
-            lat = float(latitude) / 100000 if latitude else None
-            lon = float(longitude) / 100000 if longitude else None
-            return lat, lon
-        except (ValueError, TypeError):
-            return None, None
     
     def process(self, data: List[Dict]) -> List[Dict]:
         """
@@ -103,27 +83,9 @@ class StationsStorage(BaseStorage):
                 )
             """)
     
-    def process_coordinates(self, latitude: str, longitude: str) -> Tuple[Optional[float], Optional[float]]:
-        """
-        Convert coordinate strings to float values with proper scaling.
-        
-        Args:
-            latitude: Latitude as string
-            longitude: Longitude as string
-        
-        Returns:
-            Tuple of (lat, lon) as floats, or (None, None) if conversion fails
-        """
-        try:
-            lat = float(latitude) / 100000 if latitude else None
-            lon = float(longitude) / 100000 if longitude else None
-            return lat, lon
-        except (ValueError, TypeError):
-            return None, None
-    
     def insert_data(self, conn: duckdb.DuckDBPyConnection, data_file_path: str) -> int:
         """
-        Insert station data into database.
+        Insert station data into database using bulk import with field mapping.
         
         Args:
             conn: Database connection
@@ -132,51 +94,45 @@ class StationsStorage(BaseStorage):
         Returns:
             Number of records inserted
         """
-        # Load data from JSON
-        data = load_json(data_file_path)
-        print(f"Processing {len(data)} stations...")
+        import os
         
-        inserted_count = 0
+        # Basic error checking
+        if not os.path.exists(data_file_path):
+            raise FileNotFoundError(f"Data file not found: {data_file_path}")
+            
+        print(f"Loading station data from {data_file_path}...")
         
-        # Insert data
-        for station in data:
-            try:
-                lat, lon = self.process_coordinates(
-                    station.get('latitude'), 
-                    station.get('longitude')
-                )
-                
-                conn.execute("""
-                    INSERT INTO stations (
-                        id, latitude, longitude, postal_code, address, city,
-                        services_json, hours_json,
-                        gazole_price, gazole_updated,
-                        sp95_price, sp95_updated,
-                        sp98_price, sp98_updated
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """, [
-                    station.get('id'),
-                    lat,
-                    lon,
-                    station.get('cp'),
-                    station.get('adresse'),
-                    station.get('ville'),
-                    station.get('services'),
-                    station.get('horaires'),
-                    station.get('gazole_prix'),
-                    station.get('gazole_maj'),
-                    station.get('sp95_prix'),
-                    station.get('sp95_maj'),
-                    station.get('sp98_prix'),
-                    station.get('sp98_maj')
-                ])
-                inserted_count += 1
-                
-            except Exception as e:
-                print(f"Error inserting station {station.get('id')}: {e}")
-                continue
+        # Bulk import with field mapping from French to English names
+        conn.execute(f"""
+            INSERT INTO stations (
+                id, latitude, longitude, postal_code, address, city,
+                services_json, hours_json,
+                gazole_price, gazole_updated,
+                sp95_price, sp95_updated,
+                sp98_price, sp98_updated
+            )
+            SELECT 
+                id,
+                latitude,
+                longitude,
+                cp as postal_code,
+                adresse as address,
+                ville as city,
+                services as services_json,
+                horaires as hours_json,
+                gazole_prix as gazole_price,
+                gazole_maj as gazole_updated,
+                sp95_prix as sp95_price,
+                sp95_maj as sp95_updated,
+                sp98_prix as sp98_price,
+                sp98_maj as sp98_updated
+            FROM read_json_auto('{data_file_path}')
+        """)
         
-        return inserted_count
+        # Get count of records in table
+        count = conn.execute("SELECT COUNT(*) FROM stations").fetchone()[0]
+        print(f"Loaded {count} station records")
+        return count
 
 
 class StationsPipeline(BasePipeline):

@@ -1,4 +1,5 @@
 CREATE TABLE consumption (
+    id INTEGER,
     date DATE,
     time_slot STRING,
     flag_ignore BOOLEAN,

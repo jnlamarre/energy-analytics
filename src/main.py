@@ -28,18 +28,18 @@ def main():
         print("1. Starting Consumption Pipeline...")
         consumption_pipeline = ConsumptionPipeline()
         consumption_pipeline.run_full_pipeline()
-        print("✅ Consumption pipeline completed\n")
+        print("SUCCESS: Consumption pipeline completed\n")
         
         # Run stations pipeline
         print("2. Starting Stations Pipeline...")
         stations_pipeline = StationsPipeline()
         stations_pipeline.run_full_pipeline()
-        print("✅ Stations pipeline completed\n")
+        print("SUCCESS: Stations pipeline completed\n")
         
         print("=== All pipelines completed successfully! ===")
         
     except Exception as e:
-        print(f"❌ Pipeline execution failed: {e}")
+        print(f"ERROR: Pipeline execution failed: {e}")
         sys.exit(1)
 
 

@@ -1,14 +1,12 @@
 try:
-    from ..utils.database import get_connection
+    from ..utils.database import get_connection, DuckDBConnection
 except ImportError:
-    from utils.database import get_connection
+    from utils.database import get_connection, DuckDBConnection
 
 
 def show_stations_stats(db_path: str = '../data/energy-analytics.db') -> None:
     """Display comprehensive stations data statistics."""
-    conn = get_connection(db_path)
-    
-    try:
+    with DuckDBConnection(db_path) as conn:
         print("\n" + "="*50)
         print("STATIONS DATA ANALYSIS") 
         print("="*50)
@@ -82,20 +80,12 @@ def show_stations_stats(db_path: str = '../data/energy-analytics.db') -> None:
         """).fetchall()
         for row in regions:
             print(f"Dept {row[0]}: {row[1]} stations, avg diesel €{row[2]:.3f}")
-            
-    finally:
-        conn.close()
 
 
 def show_tables_overview(db_path: str = '../data/energy-analytics.db') -> None:
     """Display overview of all tables in the database."""
-    conn = get_connection(db_path)
-    
-    try:
+    with DuckDBConnection(db_path) as conn:
         print("=== AVAILABLE TABLES ===")
         tables = conn.execute("SHOW TABLES").fetchall()
         for table in tables:
             print(f"- {table[0]}")
-            
-    finally:
-        conn.close()
