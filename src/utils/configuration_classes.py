@@ -77,7 +77,7 @@ class ConfigurationManager:
         Returns:
             List of configuration dataclass objects
         """
-        config_path = os.path.join(os.path.dirname(__file__), config_file)
+        config_path = os.path.join(os.path.dirname(__file__), '..', '..', config_file)
         
         with open(config_path, 'r', encoding='utf-8') as f:
             config_dicts = json.load(f)
@@ -144,6 +144,6 @@ class ConfigurationManager:
         Returns:
             SQL content as string
         """
-        sql_path = os.path.join(os.path.dirname(__file__), '..', 'sql', sql_filename)
+        sql_path = os.path.join(os.path.dirname(__file__), '..', '..', 'sql', sql_filename)
         with open(sql_path, 'r', encoding='utf-8') as f:
             return f.read()

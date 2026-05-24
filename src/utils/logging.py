@@ -71,10 +71,10 @@ def setup_advanced_logging(logger_name: str, log_file: str) -> logging.Logger:
     if log_dir and not os.path.exists(log_dir):
         os.makedirs(log_dir)
         
-    file_handler = logging.FileHandler(log_file, encoding='utf-8')
-    file_handler.setLevel(logging.DEBUG)
-    file_handler.setFormatter(formatter)
-    logger.addHandler(file_handler)
+    files = logging.FileHandler(log_file, encoding='utf-8')
+    files.setLevel(logging.DEBUG)
+    files.setFormatter(formatter)
+    logger.addHandler(files)
 
     return logger
 

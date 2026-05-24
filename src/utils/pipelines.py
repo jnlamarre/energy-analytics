@@ -111,12 +111,12 @@ class BaseProcessor:
         self.logger = logger or logging.getLogger(f"{table_name}_processor")
         
         try:
-            from ..utils.file_handler import save_json
+            from ..utils.files import save_json
             from ..utils.configuration_classes import ConfigurationManager
             self.save_json = save_json
             self.config_manager = ConfigurationManager
         except ImportError:
-            from utils.file_handler import save_json
+            from utils.files import save_json
             from utils.configuration_classes import ConfigurationManager
             self.save_json = save_json
             self.config_manager = ConfigurationManager

@@ -1,6 +1,6 @@
 # Energy Analytics
 
-French energy data analytics project with modern Pydantic dataclass pipelines for real-time consumption and fuel price data.
+French energy data analytics with two data pipelines: electricity/gas consumption and fuel station prices.
 
 ## Quick Start
 
@@ -8,77 +8,46 @@ French energy data analytics project with modern Pydantic dataclass pipelines fo
 # Install dependencies
 uv install
 
-# Run all OOP pipelines (from src directory)
-cd src
-python main.py
+# Run all pipelines
+cd src && python main.py
 
-# Or run individual OOP pipelines
-cd src
-python run_consumption_pipeline.py  # ConsumptionPipeline class
-python run_stations_pipeline.py     # StationsPipeline class
-python run_analytics.py             # Query and analyze data
+# Individual pipelines
+python scripts/run_consumption.py
+python scripts/run_stations.py
+python scripts/run_analytics.py
 ```
 
 ## Project Structure
 
-Object-oriented architecture with inheritance and polymorphism:
-
 ```
-src/
-├── main.py                         # Unified OOP entry point
-├── run_*.py                       # Individual OOP pipeline runners
-├── pipelines/                     # OOP pipeline implementations
-│   ├── consumption_pipeline.py   # ConsumptionPipeline class
-│   └── stations_pipeline.py      # StationsPipeline class
-├── utils/                         # Base classes and utilities
-│   ├── configuration_classes.py  # Pydantic dataclasses, ConfigurationManager
-│   ├── pipeline_classes.py       # BasePipeline, BaseProcessor, BaseStorage
-│   ├── config.py                 # Modern OOP interface
-│   ├── config.json               # English field names configuration
-│   └── *.py                      # Other utilities (API, database, file handling)
-├── analytics/                     # Data analysis queries
-└── sql/                          # Database schemas
+scripts/           # Entry point scripts
+src/              # Source code with OOP pipelines
+├── pipelines/    # Pipeline implementations
+├── utils/        # Base classes and utilities
+└── analytics/    # Data analysis queries
+config.json       # API configuration
+sql/             # Database schemas
+data/            # Generated data and database
 ```
-
-## Modern OOP Features
-
-- **Python 3.10+ Type Hinting**: Union operators (`|`), built-in generics (`list[dict]`)
-- **Advanced Logging**: Structured logging with file persistence, timing, and component isolation
-- **Pydantic Dataclasses**: Automatic validation and @property decorators
-- **English Naming**: Consistent English field names (api_type, target_file, table_name)
-- **Inheritance**: `BaseConfiguration` → `DataGouvConfiguration`/`EconomieGouvConfiguration`
-- **@property Decorators**: Dynamic URL building and computed attributes
-- **ConfigurationManager**: Factory methods with **kwargs unpacking
-- **Polymorphism**: Same pipeline interface for different data sources
-- **Context Managers**: Automatic database resource management with `DuckDBConnection`
-- **UTF-8 Encoding**: Proper handling of French accented characters
-- **Clean Architecture**: Legacy functions removed, modern OOP interface only
-
-## Data Sources
-
-- **Energy Consumption**: French electricity/gas hourly consumption via Data.gouv.fr tabular API (3,024 records)
-- **Fuel Prices**: Real-time prices from 9,772 active fuel stations via Economie.gouv.fr API
-
-## Database
-
-DuckDB database (`data/energy-analytics.db`) with two main tables:
-- `consumption` - Hourly energy consumption data (electricity, gas in MW) - 3,024 records
-- `stations` - Fuel stations with GPS coordinates, prices, and metadata - 9,772 records
-
-Data files stored in `data/` directory (git-ignored).
 
 ## Features
 
-- **Modular Architecture**: Clean separation with entity-based pipelines
-- **Advanced Logging**: Three-tier logging system (main.log, consumption.log, stations.log)
-- **Configuration-driven**: English-named JSON config with external SQL schemas and Pydantic validation
-- **High-Performance Database**: Context managers + bulk imports (200x+ faster)
-- **Efficient Date Range Fetching**: Single API call for 3-month consumption data using proper range operators
-- **Pagination Handling**: Automatic pagination for large datasets
-- **Raw Data Preservation**: Complete data integrity with clean English schemas
-- **Comprehensive Analytics**: Statistics, regional analysis, price comparisons
-- **Error Resilience**: Graceful handling of API errors and duplicates
-- **Performance Tracking**: Detailed execution timing and record counts in logs
+- **Modern Python**: Type hints, Pydantic dataclasses, OOP architecture
+- **Logging System**: Structured logging with component isolation
+- **Database**: DuckDB with context managers and bulk imports
+- **Configuration**: JSON-based config with automatic validation
+- **Performance**: Efficient pagination and date range handling
+
+## Data
+
+**Sources:**
+- Energy consumption: Data.gouv.fr tabular API (3,024 hourly records)
+- Fuel prices: Economie.gouv.fr API (9,772 stations)
+
+**Database:**
+- DuckDB: `data/energy-analytics.db`
+- Tables: `consumption`, `stations`
+- Analytics: Regional analysis, price comparisons, consumption statistics
 
 ## Requirements
 

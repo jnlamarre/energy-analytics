@@ -12,9 +12,9 @@ import os
 # Add src directory to Python path for imports
 sys.path.append(os.path.dirname(__file__))
 
-from pipelines.consumption_pipeline import ConsumptionPipeline
-from pipelines.stations_pipeline import StationsPipeline
-from utils.logging_config import get_main_logger
+from pipelines.consumption import ConsumptionPipeline
+from pipelines.stations import StationsPipeline
+from utils.logging import get_main_logger
 
 
 def main() -> None:

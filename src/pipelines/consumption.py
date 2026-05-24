@@ -3,15 +3,15 @@ import duckdb
 import logging
 
 try:
-    from ..utils.pipeline_classes import BasePipeline, BaseProcessor, BaseStorage
-    from ..utils.api_client import fetch_with_pagination
+    from ..utils.pipelines import BasePipeline, BaseProcessor, BaseStorage
+    from ..utils.api import fetch_with_pagination
     from ..utils.configuration_classes import ConfigurationManager
 except ImportError:
     import sys
     import os
     sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-    from utils.pipeline_classes import BasePipeline, BaseProcessor, BaseStorage
-    from utils.api_client import fetch_with_pagination
+    from utils.pipelines import BasePipeline, BaseProcessor, BaseStorage
+    from utils.api import fetch_with_pagination
     from utils.configuration_classes import ConfigurationManager
 
 

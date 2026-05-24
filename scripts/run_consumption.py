@@ -10,10 +10,10 @@ import sys
 import os
 
 # Add src directory to Python path for imports
-sys.path.append(os.path.dirname(__file__))
+sys.path.append(os.path.join(os.path.dirname(__file__), '../src'))
 
-from pipelines.consumption_pipeline import ConsumptionPipeline
-from utils.logging_config import get_pipeline_logger
+from pipelines.consumption import ConsumptionPipeline
+from utils.logging import get_pipeline_logger
 
 
 def main() -> None:

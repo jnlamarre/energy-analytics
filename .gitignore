@@ -73,6 +73,9 @@ logs/
 plots/
 outputs/
 
-# Trainer's course files
-cours_python_avance-18.la_librairie_typing.zip
-cours_python_avance-18.la_librairie_typing/
+# Trainer's course files (removed)
+# cours_python_avance-18.la_librairie_typing.zip
+# cours_python_avance-18.la_librairie_typing/
+
+# Claude Code IDE configuration
+.claude/
