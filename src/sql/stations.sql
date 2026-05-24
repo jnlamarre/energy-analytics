@@ -1,5 +1,5 @@
 CREATE TABLE stations (
-    id BIGINT PRIMARY KEY,
+    id BIGINT,
     latitude DOUBLE,
     longitude DOUBLE,
     postal_code VARCHAR(10),

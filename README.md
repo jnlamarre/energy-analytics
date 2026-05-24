@@ -42,6 +42,7 @@ src/
 
 ## Modern OOP Features
 
+- **Python 3.10+ Type Hinting**: Union operators (`|`), built-in generics (`list[dict]`)
 - **Pydantic Dataclasses**: Automatic validation and @property decorators
 - **English Naming**: Consistent English field names (api_type, target_file, table_name)
 - **Inheritance**: `BaseConfiguration` → `DataGouvConfiguration`/`EconomieGouvConfiguration`
@@ -49,18 +50,19 @@ src/
 - **ConfigurationManager**: Factory methods with **kwargs unpacking
 - **Polymorphism**: Same pipeline interface for different data sources
 - **Context Managers**: Automatic database resource management with `DuckDBConnection`
+- **UTF-8 Encoding**: Proper handling of French accented characters
 - **Clean Architecture**: Legacy functions removed, modern OOP interface only
 
 ## Data Sources
 
-- **Energy Consumption**: French electricity/gas hourly consumption via Data.gouv.fr tabular API
-- **Fuel Prices**: Real-time prices from 9,772 fuel stations via Economie.gouv.fr API
+- **Energy Consumption**: French electricity/gas hourly consumption via Data.gouv.fr tabular API (3,024 records)
+- **Fuel Prices**: Real-time prices from 9,772 active fuel stations via Economie.gouv.fr API
 
 ## Database
 
 DuckDB database (`data/energy-analytics.db`) with two main tables:
-- `consumption` - Hourly energy consumption data (electricity, gas in MW) 
-- `stations` - Fuel stations with GPS coordinates, prices, and metadata
+- `consumption` - Hourly energy consumption data (electricity, gas in MW) - 3,024 records
+- `stations` - Fuel stations with GPS coordinates, prices, and metadata - 9,772 records
 
 Data files stored in `data/` directory (git-ignored).
 

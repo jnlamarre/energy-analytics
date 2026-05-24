@@ -1,4 +1,4 @@
-from typing import List, Dict, Optional
+from typing import Optional
 import duckdb
 
 try:
@@ -22,7 +22,7 @@ class StationsProcessor(BaseProcessor):
     def __init__(self):
         super().__init__('stations')
     
-    def process(self, data: List[Dict]) -> List[Dict]:
+    def process(self, data: list[dict]) -> list[dict]:
         """
         Process station data (currently no transformation needed beyond coordinate processing).
         
@@ -102,7 +102,20 @@ class StationsStorage(BaseStorage):
             
         print(f"Loading station data from {data_file_path}...")
         
+        # Check if data file has content before attempting bulk import
+        import json
+        try:
+            with open(data_file_path, 'r', encoding='utf-8') as f:
+                data_content = json.load(f)
+                if not data_content:
+                    print("Warning: No data to import (empty JSON file)")
+                    return 0
+        except (json.JSONDecodeError, FileNotFoundError, UnicodeDecodeError):
+            print("Error: Cannot read data file or file is corrupted")
+            return 0
+        
         # Bulk import with field mapping from French to English names
+        # Raw data approach: insert all records including duplicates
         conn.execute(f"""
             INSERT INTO stations (
                 id, latitude, longitude, postal_code, address, city,
@@ -146,7 +159,7 @@ class StationsPipeline(BasePipeline):
         self.processor = StationsProcessor()
         self.storage = StationsStorage()
     
-    def fetch(self, **kwargs) -> List[Dict]:
+    def fetch(self, **kwargs) -> list[dict]:
         """
         Fetch fuel station data from French government API.
         
@@ -163,15 +176,16 @@ class StationsPipeline(BasePipeline):
         if not config:
             raise ValueError("No configuration found for stations table")
         
-        # Get URL template from config property (already includes {step} and {offset} placeholders)
+        # Get URL template from config property (includes {step} and {offset} placeholders)
+        # Convert {step} to {limit} for fetch_paginated_api function
         url_template = config.url.replace('{step}', '{limit}')
         
-        data = fetch_paginated_api(url_template)
+        data = fetch_paginated_api(url_template, limit=100, max_records=10000)
         print(f"Total stations fetched: {len(data)}")
         
         return data
     
-    def process(self, data: List[Dict]) -> List[Dict]:
+    def process(self, data: list[dict]) -> list[dict]:
         """
         Process station data.
         
@@ -183,7 +197,7 @@ class StationsPipeline(BasePipeline):
         """
         return self.processor.process(data)
     
-    def store(self, data: List[Dict], file_path: str = None) -> None:
+    def store(self, data: list[dict], file_path: str | None = None) -> None:
         """
         Store station data to JSON file.
         

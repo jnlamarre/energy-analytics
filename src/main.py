@@ -16,7 +16,7 @@ from pipelines.consumption_pipeline import ConsumptionPipeline
 from pipelines.stations_pipeline import StationsPipeline
 
 
-def main():
+def main() -> None:
     """
     Run all data pipelines using OOP approach.
     """

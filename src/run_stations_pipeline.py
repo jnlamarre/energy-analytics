@@ -15,7 +15,7 @@ sys.path.append(os.path.dirname(__file__))
 from pipelines.stations_pipeline import StationsPipeline
 
 
-def main():
+def main() -> None:
     """
     Run the stations data pipeline using OOP approach.
     """

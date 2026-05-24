@@ -5,7 +5,7 @@ from src.analytics.stations_queries import show_tables_overview, show_stations_s
 from src.analytics.consumption_queries import show_consumption_stats
 
 
-def main():
+def main() -> None:
     """Run comprehensive database analytics"""
     show_tables_overview()
     show_consumption_stats()

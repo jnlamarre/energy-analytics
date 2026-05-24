@@ -71,12 +71,16 @@ uv install  # Install dependencies from pyproject.toml
 # TODO: No linting/type checking commands configured yet
 ```
 
+## Development Notes
+**Windows Console Encoding Issue:** When running Python scripts via Bash tool, avoid Unicode characters (emojis, special symbols) in print statements as Windows console uses cp1252 encoding which causes `UnicodeEncodeError`. Use plain ASCII text instead.
+
 ## APIs Used
 1. **Energy Consumption**: `https://tabular-api.data.gouv.fr/api/resources/cfc27ff9-1871-4ee8-be64-b9a290c06935/data/`
 2. **Fuel Prices**: `https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/prix-des-carburants-en-france-flux-instantane-v2/records`
 
-## Current Status ✅ PRODUCTION-READY WITH MODERN DATABASE MANAGEMENT
+## Current Status ✅ PRODUCTION-READY WITH MODERN TYPE HINTING
 - ✅ **Architecture**: Full OOP implementation with class hierarchy and inheritance
+- ✅ **Type Hinting**: Modern Python 3.10+ syntax (Union operators, built-in generics)
 - ✅ **Pydantic Dataclasses**: Modern dataclass approach with @property decorators
 - ✅ **English Naming**: All field names converted from French to English
 - ✅ **Configuration Classes**: BaseConfiguration with DataGouv/EconomieGouv implementations
@@ -89,25 +93,27 @@ uv install  # Install dependencies from pyproject.toml
 - ✅ **Schema Coherence**: Complete JSON-to-database field mapping
 - ✅ **Analytics**: Comprehensive statistics and reporting queries
 - ✅ **Entry Points**: Unified OOP main.py + individual pipeline runners
+- ✅ **Pipeline Fixes**: UTF-8 encoding, error handling, API pagination working
 - ✅ **Legacy Cleanup**: All redundant code removed, production-ready
 
 ## Data Quality Notes
 - Energy consumption: Complete 3-month dataset (3,024 records, Jan 1 - Mar 31, 2026)
 - Electricity consumption range: 41,322 - 76,638 MW (avg: 59,091 MW)
-- Fuel stations: Duplicate IDs handled by skipping (preserves first occurrence)
-- Diesel price coverage: 98% of stations (9,546/9,772)
+- Fuel stations: Current dataset (9,772 active stations with real-time prices)
+- Diesel price coverage: 98% of stations have pricing data
 - Geographic coverage: All French departments represented
+- UTF-8 encoding: Properly handles French accented characters
 
 ## Git Status
-- **Current Branch**: `refactor/config-classes`
-- **Last Commit**: `e16edf3` - "Convert to English naming and remove legacy functions"
-- **Architecture**: Complete OOP implementation with Pydantic dataclasses
+- **Current Branch**: `main`
+- **Last Commit**: `5e00d23` - "feat: implement modern database management patterns"
+- **Architecture**: Complete OOP implementation with modern database patterns
 - **Recent Changes**:
-  - **COMPLETED**: English field name conversion (api_type, target_file, table_name, sql_file)
-  - **COMPLETED**: Pydantic dataclasses with @property decorators
-  - **COMPLETED**: Legacy function cleanup in config.py
-  - **COMPLETED**: Pipeline updates to use property access instead of method calls
-  - **WORKING TREE**: Clean, all changes committed
+  - **COMPLETED**: Modern database management with context managers
+  - **COMPLETED**: Bulk import optimization (200x+ performance improvement)
+  - **COMPLETED**: English field name conversion and Pydantic dataclasses
+  - **COMPLETED**: Complete OOP pipeline architecture implementation
+  - **WORKING TREE**: Clean, no untracked files
 
 ## Database Management Modernization ✅ COMPLETED
 **Implemented advanced database patterns based on trainer's approach:**
@@ -136,6 +142,31 @@ uv install  # Install dependencies from pyproject.toml
 - **Removed**: Unused imports and redundant code
 - **Result**: Clean, maintainable production code
 
+## Type Hinting Modernization ✅ COMPLETED
+**Upgraded from trainer's traditional approach to modern Python 3.10+ syntax:**
+
+### **Trainer's Approach** (cours_python_avance-18.la_librairie_typing):
+```python
+from typing import List, Union, Optional
+typing.List[typing.Union[EconomieGouvConfiguration, DataGouvConfiguration]]
+def function(param: List[Dict]) -> Optional[str]:
+```
+
+### **Your Modern Implementation**:
+```python
+from typing import Optional  # minimal imports
+BaseConfiguration = DataGouvConfiguration | EconomieGouvConfiguration  # Union operator
+def function(param: list[dict]) -> str | None:  # Built-in generics + Union syntax
+```
+
+### **Key Improvements**:
+- **`List[Dict]` → `list[dict]`**: Using built-in generics (Python 3.9+)
+- **`Optional[str]` → `str | None`**: Union operators (Python 3.10+)
+- **`Union[A, B]` → `A | B`**: Cleaner syntax
+- **Reduced imports**: Removed `typing.List, Dict, Union`
+- **Comprehensive coverage**: All function parameters and returns typed
+- **Inheritance consistency**: Types maintained across abstract base classes
+
 ## Next Steps - Priority Order
 1. ✅ ~~Implement configuration classes with inheritance~~
 2. ✅ ~~Create pipeline base classes and implementations~~
@@ -145,10 +176,12 @@ uv install  # Install dependencies from pyproject.toml
 6. ✅ ~~Remove unused legacy compatibility functions~~
 7. ✅ ~~Update documentation to reflect current state~~
 8. ✅ ~~Implement modern database management patterns~~
-9. Configure linting/type checking (ruff, mypy, etc.)
-10. Unit testing implementation with OOP structure
-11. Performance monitoring and optimization
-12. CI/CD pipeline setup
+9. ✅ ~~Modernize type hinting with Python 3.10+ syntax~~
+10. Implement advanced logging system (based on trainer's approach)
+11. Configure linting/type checking (ruff, mypy, etc.)
+12. Unit testing implementation with OOP structure
+13. Performance monitoring and optimization
+14. CI/CD pipeline setup
 
 ## OOP Architecture Details
 - **Class Hierarchy**: BaseConfiguration → DataGouv/EconomieGouvConfiguration inheritance

@@ -1,4 +1,4 @@
-from typing import List, Dict, Optional
+from typing import Optional
 from abc import ABC, abstractmethod
 
 
@@ -18,7 +18,7 @@ class BasePipeline(ABC):
         self.table_name = table_name
     
     @abstractmethod
-    def fetch(self, **kwargs) -> List[Dict]:
+    def fetch(self, **kwargs) -> list[dict]:
         """
         Fetch data from external API.
         
@@ -31,7 +31,7 @@ class BasePipeline(ABC):
         pass
     
     @abstractmethod
-    def process(self, data: List[Dict]) -> List[Dict]:
+    def process(self, data: list[dict]) -> list[dict]:
         """
         Process and transform the fetched data.
         
@@ -44,7 +44,7 @@ class BasePipeline(ABC):
         pass
     
     @abstractmethod
-    def store(self, data: List[Dict], file_path: str = None) -> None:
+    def store(self, data: list[dict], file_path: str | None = None) -> None:
         """
         Store processed data to JSON file.
         
@@ -116,7 +116,7 @@ class BaseProcessor:
             self.save_json = save_json
             self.config_manager = ConfigurationManager
     
-    def save_to_file(self, data: List[Dict], file_path: str = None) -> None:
+    def save_to_file(self, data: list[dict], file_path: str | None = None) -> None:
         """
         Save data to JSON file using configuration.
         

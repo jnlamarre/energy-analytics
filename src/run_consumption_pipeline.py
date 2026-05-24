@@ -15,7 +15,7 @@ sys.path.append(os.path.dirname(__file__))
 from pipelines.consumption_pipeline import ConsumptionPipeline
 
 
-def main():
+def main() -> None:
     """
     Run the consumption data pipeline using OOP approach.
     """

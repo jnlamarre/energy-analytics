@@ -1,4 +1,4 @@
-from typing import List, Dict, Optional
+from typing import Optional
 import duckdb
 
 try:
@@ -22,7 +22,7 @@ class ConsumptionProcessor(BaseProcessor):
     def __init__(self):
         super().__init__('consumption')
     
-    def process(self, data: List[Dict]) -> List[Dict]:
+    def process(self, data: list[dict]) -> list[dict]:
         """
         Process consumption data (currently no transformation needed).
         
@@ -122,7 +122,7 @@ class ConsumptionPipeline(BasePipeline):
         self.processor = ConsumptionProcessor()
         self.storage = ConsumptionStorage()
     
-    def fetch(self, start_date: str = None, end_date: str = None, single_date: str = None, **kwargs) -> List[Dict]:
+    def fetch(self, start_date: str | None = None, end_date: str | None = None, single_date: str | None = None, **kwargs) -> list[dict]:
         """
         Fetch energy consumption data from French government API.
         
@@ -172,7 +172,7 @@ class ConsumptionPipeline(BasePipeline):
             print(f"Error fetching data: {e}")
             return []
     
-    def process(self, data: List[Dict]) -> List[Dict]:
+    def process(self, data: list[dict]) -> list[dict]:
         """
         Process consumption data.
         
@@ -184,7 +184,7 @@ class ConsumptionPipeline(BasePipeline):
         """
         return self.processor.process(data)
     
-    def store(self, data: List[Dict], file_path: str = None) -> None:
+    def store(self, data: list[dict], file_path: str | None = None) -> None:
         """
         Store consumption data to JSON file.
         

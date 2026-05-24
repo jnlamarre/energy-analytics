@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Optional
 from .configuration_classes import BaseConfiguration, ConfigurationManager
 
 
@@ -16,7 +16,7 @@ def get_configuration_by_table(table_name: str) -> Optional[BaseConfiguration]:
     return ConfigurationManager.get_configuration_by_table(table_name)
 
 
-def get_all_configurations() -> List[BaseConfiguration]:
+def get_all_configurations() -> list[BaseConfiguration]:
     """
     Get all configuration objects.
     

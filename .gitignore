@@ -71,3 +71,7 @@ Thumbs.db
 *.xlsx
 plots/
 outputs/
+
+# Trainer's course files
+cours_python_avance-18.la_librairie_typing.zip
+cours_python_avance-18.la_librairie_typing/

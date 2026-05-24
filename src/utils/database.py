@@ -21,7 +21,7 @@ class DuckDBConnection:
         return False  # Don't suppress exceptions
 
 
-def execute_query(query: str, db_path: str = '../data/energy-analytics.db'):
+def execute_query(query: str, db_path: str = '../data/energy-analytics.db') -> list:
     """Execute a query using context manager pattern."""
     with DuckDBConnection(db_path) as conn:
         return conn.execute(query).fetchall()

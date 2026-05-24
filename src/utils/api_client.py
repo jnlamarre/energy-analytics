@@ -1,13 +1,13 @@
 import requests
-from typing import Dict, List, Any, Optional
+from typing import Any, Optional
 
 
 def fetch_with_pagination(
     base_url: str,
-    params: Dict[str, Any] = None,
+    params: dict[str, Any] | None = None,
     pagination_key: str = 'next',
     data_key: str = 'data'
-) -> List[Dict]:
+) -> list[dict]:
     """
     Fetch data from an API with pagination support.
     
@@ -53,7 +53,7 @@ def fetch_paginated_api(
     url_template: str,
     limit: int = 100,
     max_records: Optional[int] = None
-) -> List[Dict]:
+) -> list[dict]:
     """
     Fetch data from an API using offset-based pagination.
     

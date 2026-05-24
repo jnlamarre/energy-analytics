@@ -1,10 +1,7 @@
-from typing import List, Optional, Union
+from typing import Optional
 import json
 import os
 from pydantic.dataclasses import dataclass
-
-# Type alias for configuration objects
-BaseConfiguration = Union['DataGouvConfiguration', 'EconomieGouvConfiguration']
 
 
 @dataclass
@@ -41,7 +38,7 @@ class EconomieGouvConfiguration:
     sql_file: str
     sql_creation: str
     table_name: str
-    select: Optional[List[str]] = None
+    select: Optional[list[str]] = None
 
     @property
     def url(self) -> str:
@@ -60,13 +57,17 @@ class EconomieGouvConfiguration:
             return f"{base_url}?limit={{step}}&offset={{offset}}"
 
 
+# Type alias for configuration objects (Python 3.10+ syntax)
+BaseConfiguration = DataGouvConfiguration | EconomieGouvConfiguration
+
+
 class ConfigurationManager:
     """
     Manager class for loading and managing Pydantic dataclass configurations.
     """
     
     @classmethod
-    def load_all_configurations(cls, config_file: str = 'config.json') -> List[BaseConfiguration]:
+    def load_all_configurations(cls, config_file: str = 'config.json') -> list[BaseConfiguration]:
         """
         Load all configurations from JSON file into Pydantic dataclass objects.
         
@@ -118,7 +119,7 @@ class ConfigurationManager:
         return None
     
     @classmethod
-    def get_configurations_by_api_type(cls, api_type: str) -> List[BaseConfiguration]:
+    def get_configurations_by_api_type(cls, api_type: str) -> list[BaseConfiguration]:
         """
         Get all configurations for a specific API type.
         
