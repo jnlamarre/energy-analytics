@@ -1,16 +1,32 @@
 [
   {
-    "type_api": "economie_gouv",
+    "api_type": "economie_gouv",
     "dataset": "prix-des-carburants-en-france-flux-instantane-v2",
-    "fichier_cible": "../data/stations.json",
-    "fichier_sql": "stations.sql",
-    "nom_table": "stations"
+    "target_file": "../data/stations.json",
+    "sql_file": "stations.sql",
+    "table_name": "stations",
+    "select": [
+      "id",
+      "latitude",
+      "longitude",
+      "cp",
+      "adresse",
+      "ville",
+      "services",
+      "gazole_prix",
+      "gazole_maj",
+      "horaires",
+      "sp95_maj",
+      "sp95_prix",
+      "sp98_maj",
+      "sp98_prix"
+    ]
   },
   {
-    "type_api": "data_gouv",
+    "api_type": "data_gouv",
     "dataset": "cfc27ff9-1871-4ee8-be64-b9a290c06935",
-    "fichier_cible": "../data/consumption.json",
-    "fichier_sql": "consumption.sql",
-    "nom_table": "consumption"
+    "target_file": "../data/consumption.json",
+    "sql_file": "consumption.sql",
+    "table_name": "consumption"
   }
 ]

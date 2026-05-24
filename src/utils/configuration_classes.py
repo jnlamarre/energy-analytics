@@ -1,91 +1,28 @@
-from typing import Dict, Any, List
+from typing import List, Optional, Union
 import json
 import os
+from pydantic.dataclasses import dataclass
+
+# Type alias for configuration objects
+BaseConfiguration = Union['DataGouvConfiguration', 'EconomieGouvConfiguration']
 
 
-class BaseConfiguration:
+@dataclass
+class DataGouvConfiguration:
     """
-    Base configuration class for API data sources.
+    Configuration for data.gouv.fr Tabular API (energy consumption data).
     """
-    
-    def __init__(self, config_dict: Dict[str, Any]):
-        """
-        Initialize configuration from dictionary.
-        
-        Args:
-            config_dict: Configuration dictionary from JSON
-        """
-        self.config = config_dict
-        self.table_name = config_dict.get('nom_table')
-        self.dataset = config_dict.get('dataset')
-        self.api_type = config_dict.get('type_api')
-        self.target_file = config_dict.get('fichier_cible')
-        self.sql_file = config_dict.get('fichier_sql')
-        self.sql_creation = config_dict.get('sql_creation')
-    
-    def load_sql_schema(self) -> None:
-        """
-        Load SQL schema from file and store in sql_creation attribute.
-        """
-        if self.sql_file:
-            sql_path = os.path.join(os.path.dirname(__file__), '..', 'sql', self.sql_file)
-            with open(sql_path, 'r', encoding='utf-8') as f:
-                self.sql_creation = f.read()
-    
-    @classmethod
-    def create_from_dict(cls, config_dict: Dict[str, Any]) -> 'BaseConfiguration':
-        """
-        Factory method to create appropriate configuration object.
-        
-        Args:
-            config_dict: Configuration dictionary from JSON
-            
-        Returns:
-            Configuration object instance
-            
-        Raises:
-            ValueError: If API type is not supported
-        """
-        # Load SQL content
-        if 'fichier_sql' in config_dict:
-            sql_path = os.path.join(os.path.dirname(__file__), '..', 'sql', config_dict['fichier_sql'])
-            with open(sql_path, 'r', encoding='utf-8') as f:
-                config_dict['sql_creation'] = f.read()
-        
-        api_type = config_dict.get('type_api')
-        
-        if api_type == 'data_gouv':
-            return DataGouvConfiguration(config_dict)
-        elif api_type == 'economie_gouv':
-            return EconomieGouvConfiguration(config_dict)
-        else:
-            raise ValueError(f"Unsupported API type: {api_type}")
-    
-    def build_url(self, **kwargs) -> str:
-        """
-        Build API URL with given parameters.
-        
-        Args:
-            **kwargs: URL parameters
-            
-        Returns:
-            Complete API URL
-            
-        Raises:
-            NotImplementedError: Must be implemented by subclasses
-        """
-        raise NotImplementedError("Subclasses must implement build_url method")
+    api_type: str
+    dataset: str
+    target_file: str
+    sql_file: str
+    sql_creation: str
+    table_name: str
 
-
-class DataGouvConfiguration(BaseConfiguration):
-    """
-    Configuration for data.gouv.fr Tabular API.
-    Used for energy consumption data.
-    """
-    
-    def build_url(self, **kwargs) -> str:
+    @property
+    def url(self) -> str:
         """
-        Build Tabular API URL.
+        Build Tabular API URL dynamically.
         
         Returns:
             Complete API URL for data.gouv.fr tabular API
@@ -93,60 +30,76 @@ class DataGouvConfiguration(BaseConfiguration):
         return f'https://tabular-api.data.gouv.fr/api/resources/{self.dataset}/data/'
 
 
-class EconomieGouvConfiguration(BaseConfiguration):
+@dataclass
+class EconomieGouvConfiguration:
     """
-    Configuration for data.economie.gouv.fr OpenData API.
-    Used for fuel station price data.
+    Configuration for data.economie.gouv.fr OpenData API (fuel station data).
     """
-    
-    def build_url(self, limit: int = 100, offset: int = 0, **kwargs) -> str:
+    api_type: str
+    dataset: str
+    target_file: str
+    sql_file: str
+    sql_creation: str
+    table_name: str
+    select: Optional[List[str]] = None
+
+    @property
+    def url(self) -> str:
         """
-        Build OpenData API URL with pagination and selection parameters.
+        Build OpenData API URL template with select parameters.
         
-        Args:
-            limit: Number of records per page
-            offset: Starting offset for pagination
-            **kwargs: Additional parameters (ignored)
-            
         Returns:
-            Complete API URL for economie.gouv.fr API
+            API URL template with {step} and {offset} placeholders
         """
         base_url = f'https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/{self.dataset}/records'
         
-        # Add select parameters for fuel station data
-        if 'prix-des-carburants' in self.dataset:
-            select_params = 'id%2Clatitude%2Clongitude%2Ccp%2Cadresse%2Cville%2Cservices%2Cgazole_prix%2Cgazole_maj%2Choraires%2Csp95_maj%2Csp95_prix%2Csp98_maj%2Csp98_prix'
-            base_url += f'?select={select_params}'
-            base_url += f'&limit={limit}&offset={offset}'
-        
-        return base_url
+        if self.select:
+            select_param = "%2C".join(self.select)
+            return f"{base_url}?select={select_param}&limit={{step}}&offset={{offset}}"
+        else:
+            return f"{base_url}?limit={{step}}&offset={{offset}}"
 
 
 class ConfigurationManager:
     """
-    Manager class for loading and managing configurations.
+    Manager class for loading and managing Pydantic dataclass configurations.
     """
     
     @classmethod
     def load_all_configurations(cls, config_file: str = 'config.json') -> List[BaseConfiguration]:
         """
-        Load all configurations from JSON file.
+        Load all configurations from JSON file into Pydantic dataclass objects.
         
         Args:
             config_file: Name of the configuration file
             
         Returns:
-            List of configuration objects
+            List of configuration dataclass objects
         """
         config_path = os.path.join(os.path.dirname(__file__), config_file)
         
         with open(config_path, 'r', encoding='utf-8') as f:
             config_dicts = json.load(f)
         
-        return [BaseConfiguration.create_from_dict(config) for config in config_dicts]
+        configurations = []
+        for config_dict in config_dicts:
+            # Load SQL content
+            if 'sql_file' in config_dict:
+                config_dict['sql_creation'] = cls._load_sql_file(config_dict['sql_file'])
+            
+            # Create appropriate configuration object using **kwargs unpacking
+            api_type = config_dict.get('api_type')
+            if api_type == 'data_gouv':
+                configurations.append(DataGouvConfiguration(**config_dict))
+            elif api_type == 'economie_gouv':
+                configurations.append(EconomieGouvConfiguration(**config_dict))
+            else:
+                raise ValueError(f"Unsupported API type: {api_type}")
+        
+        return configurations
     
     @classmethod
-    def get_configuration_by_table(cls, table_name: str) -> BaseConfiguration:
+    def get_configuration_by_table(cls, table_name: str) -> Optional[BaseConfiguration]:
         """
         Get configuration object for a specific table.
         
@@ -178,3 +131,18 @@ class ConfigurationManager:
         configurations = cls.load_all_configurations()
         
         return [config for config in configurations if config.api_type == api_type]
+    
+    @classmethod
+    def _load_sql_file(cls, sql_filename: str) -> str:
+        """
+        Load SQL content from file.
+        
+        Args:
+            sql_filename: Name of the SQL file
+            
+        Returns:
+            SQL content as string
+        """
+        sql_path = os.path.join(os.path.dirname(__file__), '..', 'sql', sql_filename)
+        with open(sql_path, 'r', encoding='utf-8') as f:
+            return f.read()

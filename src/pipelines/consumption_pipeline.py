@@ -141,8 +141,8 @@ class ConsumptionPipeline(BasePipeline):
         if not config:
             raise ValueError("No configuration found for consumption table")
         
-        # Build API URL from config
-        base_url = config.build_url()
+        # Get API URL from config property
+        base_url = config.url
         
         # Determine query parameters
         if single_date:

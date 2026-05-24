@@ -1,6 +1,6 @@
 # Energy Analytics
 
-French energy data analytics project with object-oriented pipelines for real-time consumption and fuel price data.
+French energy data analytics project with modern Pydantic dataclass pipelines for real-time consumption and fuel price data.
 
 ## Quick Start
 
@@ -31,26 +31,29 @@ src/
 │   ├── consumption_pipeline.py   # ConsumptionPipeline class
 │   └── stations_pipeline.py      # StationsPipeline class
 ├── utils/                         # Base classes and utilities
-│   ├── configuration_classes.py  # BaseConfiguration, ConfigurationManager
+│   ├── configuration_classes.py  # Pydantic dataclasses, ConfigurationManager
 │   ├── pipeline_classes.py       # BasePipeline, BaseProcessor, BaseStorage
-│   ├── config.py                 # Legacy compatibility functions
+│   ├── config.py                 # Modern OOP interface
+│   ├── config.json               # English field names configuration
 │   └── *.py                      # Other utilities (API, database, file handling)
 ├── analytics/                     # Data analysis queries
 └── sql/                          # Database schemas
 ```
 
-## OOP Features
+## Modern OOP Features
 
+- **Pydantic Dataclasses**: Automatic validation and @property decorators
+- **English Naming**: Consistent English field names (api_type, target_file, table_name)
 - **Inheritance**: `BaseConfiguration` → `DataGouvConfiguration`/`EconomieGouvConfiguration`
+- **@property Decorators**: Dynamic URL building and computed attributes
+- **ConfigurationManager**: Factory methods with **kwargs unpacking
 - **Polymorphism**: Same pipeline interface for different data sources
-- **Factory Pattern**: `BaseConfiguration.create_from_dict()` for object creation
-- **Manager Pattern**: `ConfigurationManager` for centralized config operations
-- **Abstract Classes**: Clear interfaces for extensibility
+- **Clean Architecture**: Legacy functions removed, modern OOP interface only
 
 ## Data Sources
 
 - **Energy Consumption**: French electricity/gas hourly consumption via Data.gouv.fr tabular API
-- **Fuel Prices**: Real-time prices from 9,700+ fuel stations via Economie.gouv.fr API
+- **Fuel Prices**: Real-time prices from 9,772 fuel stations via Economie.gouv.fr API
 
 ## Database
 
@@ -63,7 +66,7 @@ Data files stored in `data/` directory (git-ignored).
 ## Features
 
 - **Modular Architecture**: Clean separation with entity-based pipelines
-- **Configuration-driven**: JSON config with external SQL schemas
+- **Configuration-driven**: English-named JSON config with external SQL schemas and Pydantic validation
 - **Efficient Date Range Fetching**: Single API call for 3-month consumption data using proper range operators
 - **Pagination Handling**: Automatic pagination for large datasets
 - **Comprehensive Analytics**: Statistics, regional analysis, price comparisons

@@ -207,8 +207,8 @@ class StationsPipeline(BasePipeline):
         if not config:
             raise ValueError("No configuration found for stations table")
         
-        # Build URL template from config
-        url_template = config.build_url(limit='{limit}', offset='{offset}')
+        # Get URL template from config property (already includes {step} and {offset} placeholders)
+        url_template = config.url.replace('{step}', '{limit}')
         
         data = fetch_paginated_api(url_template)
         print(f"Total stations fetched: {len(data)}")
