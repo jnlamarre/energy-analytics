@@ -1,5 +1,6 @@
 from typing import Optional
 from abc import ABC, abstractmethod
+import logging
 
 
 class BasePipeline(ABC):
@@ -8,14 +9,16 @@ class BasePipeline(ABC):
     Defines the common interface for fetch -> process -> store operations.
     """
     
-    def __init__(self, table_name: str):
+    def __init__(self, table_name: str, logger: Optional[logging.Logger] = None):
         """
-        Initialize pipeline with table name.
+        Initialize pipeline with table name and optional logger.
         
         Args:
             table_name: Name of the database table
+            logger: Optional logger instance for pipeline operations
         """
         self.table_name = table_name
+        self.logger = logger or logging.getLogger(f"{table_name}_pipeline")
     
     @abstractmethod
     def fetch(self, **kwargs) -> list[dict]:
@@ -72,15 +75,15 @@ class BasePipeline(ABC):
             db_path: Path to database file
             **fetch_kwargs: Arguments for the fetch method
         """
-        print(f"Starting {self.__class__.__name__} pipeline...")
+        self.logger.info(f"Starting {self.__class__.__name__} pipeline...")
         
         # Fetch data
         raw_data = self.fetch(**fetch_kwargs)
-        print(f"Fetched {len(raw_data)} records")
+        self.logger.info(f"Fetched {len(raw_data)} records")
         
         # Process data
         processed_data = self.process(raw_data)
-        print(f"Processed {len(processed_data)} records")
+        self.logger.info(f"Processed {len(processed_data)} records")
         
         # Store to file
         self.store(processed_data)
@@ -88,7 +91,7 @@ class BasePipeline(ABC):
         # Load to database
         self.load_to_database(db_path)
         
-        print(f"{self.__class__.__name__} pipeline completed successfully!")
+        self.logger.info(f"{self.__class__.__name__} pipeline completed successfully!")
 
 
 class BaseProcessor:
@@ -96,14 +99,16 @@ class BaseProcessor:
     Base class for data processors with common functionality.
     """
     
-    def __init__(self, table_name: str):
+    def __init__(self, table_name: str, logger: Optional[logging.Logger] = None):
         """
-        Initialize processor with table name.
+        Initialize processor with table name and optional logger.
         
         Args:
             table_name: Name of the database table
+            logger: Optional logger instance for processor operations
         """
         self.table_name = table_name
+        self.logger = logger or logging.getLogger(f"{table_name}_processor")
         
         try:
             from ..utils.file_handler import save_json
@@ -130,9 +135,9 @@ class BaseProcessor:
                 raise ValueError(f"No configuration found for {self.table_name} table")
             file_path = config.target_file
             
-        print(f"Saving {self.table_name} data to JSON file...")
+        self.logger.info(f"Saving {self.table_name} data to JSON file...")
         self.save_json(data, file_path)
-        print(f"Data saved to {file_path}")
+        self.logger.info(f"Data saved to {file_path}")
 
 
 class BaseStorage:
@@ -140,14 +145,16 @@ class BaseStorage:
     Base class for database storage with common functionality.
     """
     
-    def __init__(self, table_name: str):
+    def __init__(self, table_name: str, logger: Optional[logging.Logger] = None):
         """
-        Initialize storage with table name.
+        Initialize storage with table name and optional logger.
         
         Args:
             table_name: Name of the database table
+            logger: Optional logger instance for storage operations
         """
         self.table_name = table_name
+        self.logger = logger or logging.getLogger(f"{table_name}_storage")
         
         try:
             from ..utils.database import get_connection, DuckDBConnection
@@ -193,7 +200,7 @@ class BaseStorage:
         Args:
             db_path: Path to database file
         """
-        print(f"Loading {self.table_name} data into database...")
+        self.logger.info(f"Loading {self.table_name} data into database...")
         
         with self.DuckDBConnection(db_path) as conn:
             # Create table
@@ -208,6 +215,6 @@ class BaseStorage:
             
             # Insert data
             record_count = self.insert_data(conn, data_file_path)
-            print(f"Successfully loaded {record_count} records")
+            self.logger.info(f"Successfully loaded {record_count} records")
             
-        print("Database loading completed!")
+        self.logger.info("Database loading completed!")

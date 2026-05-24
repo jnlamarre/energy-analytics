@@ -43,6 +43,7 @@ src/
 ## Modern OOP Features
 
 - **Python 3.10+ Type Hinting**: Union operators (`|`), built-in generics (`list[dict]`)
+- **Advanced Logging**: Structured logging with file persistence, timing, and component isolation
 - **Pydantic Dataclasses**: Automatic validation and @property decorators
 - **English Naming**: Consistent English field names (api_type, target_file, table_name)
 - **Inheritance**: `BaseConfiguration` → `DataGouvConfiguration`/`EconomieGouvConfiguration`
@@ -69,6 +70,7 @@ Data files stored in `data/` directory (git-ignored).
 ## Features
 
 - **Modular Architecture**: Clean separation with entity-based pipelines
+- **Advanced Logging**: Three-tier logging system (main.log, consumption.log, stations.log)
 - **Configuration-driven**: English-named JSON config with external SQL schemas and Pydantic validation
 - **High-Performance Database**: Context managers + bulk imports (200x+ faster)
 - **Efficient Date Range Fetching**: Single API call for 3-month consumption data using proper range operators
@@ -76,6 +78,7 @@ Data files stored in `data/` directory (git-ignored).
 - **Raw Data Preservation**: Complete data integrity with clean English schemas
 - **Comprehensive Analytics**: Statistics, regional analysis, price comparisons
 - **Error Resilience**: Graceful handling of API errors and duplicates
+- **Performance Tracking**: Detailed execution timing and record counts in logs
 
 ## Requirements
 

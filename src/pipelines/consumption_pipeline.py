@@ -1,5 +1,6 @@
 from typing import Optional
 import duckdb
+import logging
 
 try:
     from ..utils.pipeline_classes import BasePipeline, BaseProcessor, BaseStorage
@@ -19,8 +20,8 @@ class ConsumptionProcessor(BaseProcessor):
     Processor for energy consumption data.
     """
     
-    def __init__(self):
-        super().__init__('consumption')
+    def __init__(self, logger: Optional[logging.Logger] = None):
+        super().__init__('consumption', logger)
     
     def process(self, data: list[dict]) -> list[dict]:
         """
@@ -40,8 +41,8 @@ class ConsumptionStorage(BaseStorage):
     Storage handler for consumption data.
     """
     
-    def __init__(self):
-        super().__init__('consumption')
+    def __init__(self, logger: Optional[logging.Logger] = None):
+        super().__init__('consumption', logger)
     
     def create_table(self, conn: duckdb.DuckDBPyConnection) -> None:
         """
@@ -117,10 +118,10 @@ class ConsumptionPipeline(BasePipeline):
     Handles fetching from API, processing, and storage.
     """
     
-    def __init__(self):
-        super().__init__('consumption')
-        self.processor = ConsumptionProcessor()
-        self.storage = ConsumptionStorage()
+    def __init__(self, logger: Optional[logging.Logger] = None):
+        super().__init__('consumption', logger)
+        self.processor = ConsumptionProcessor(logger)
+        self.storage = ConsumptionStorage(logger)
     
     def fetch(self, start_date: str | None = None, end_date: str | None = None, single_date: str | None = None, **kwargs) -> list[dict]:
         """
@@ -135,7 +136,7 @@ class ConsumptionPipeline(BasePipeline):
         Returns:
             List of consumption records
         """
-        print("Fetching consumption data...")
+        self.logger.info("Fetching consumption data...")
         
         # Get configuration
         config = ConfigurationManager.get_configuration_by_table('consumption')
@@ -149,7 +150,7 @@ class ConsumptionPipeline(BasePipeline):
         if single_date:
             # Single date query
             params = {'Date__exact': f'"{single_date}"'}
-            print(f"Fetching data for single date: {single_date}")
+            self.logger.info(f"Fetching data for single date: {single_date}")
         else:
             # Date range query
             if not start_date:
@@ -161,15 +162,15 @@ class ConsumptionPipeline(BasePipeline):
                 'Date__greater': start_date,
                 'Date__less': end_date
             }
-            print(f"Fetching data for date range: {start_date} to {end_date}")
+            self.logger.info(f"Fetching data for date range: {start_date} to {end_date}")
         
         try:
             data = fetch_with_pagination(base_url, params)
-            print(f"Total consumption records collected: {len(data)}")
+            self.logger.info(f"Total consumption records collected: {len(data)}")
             return data
             
         except Exception as e:
-            print(f"Error fetching data: {e}")
+            self.logger.error(f"Error fetching consumption data: {e}")
             return []
     
     def process(self, data: list[dict]) -> list[dict]:

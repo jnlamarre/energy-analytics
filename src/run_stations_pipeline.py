@@ -13,22 +13,26 @@ import os
 sys.path.append(os.path.dirname(__file__))
 
 from pipelines.stations_pipeline import StationsPipeline
+from utils.logging_config import get_pipeline_logger
 
 
 def main() -> None:
     """
     Run the stations data pipeline using OOP approach.
     """
-    print("=== Fuel Stations Data Pipeline (OOP) ===")
+    # Setup pipeline logger
+    logger = get_pipeline_logger('stations')
     
-    # Create pipeline instance
-    pipeline = StationsPipeline()
+    logger.info("=== Fuel Stations Data Pipeline (OOP) ===")
+    
+    # Create pipeline instance with logger
+    pipeline = StationsPipeline(logger)
     
     # Run the complete pipeline
     # This will: fetch -> process -> store -> load to database
     pipeline.run_full_pipeline()
     
-    print("=== Pipeline completed successfully! ===")
+    logger.info("=== Pipeline completed successfully! ===")
 
 
 if __name__ == "__main__":

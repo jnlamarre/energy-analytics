@@ -14,32 +14,36 @@ sys.path.append(os.path.dirname(__file__))
 
 from pipelines.consumption_pipeline import ConsumptionPipeline
 from pipelines.stations_pipeline import StationsPipeline
+from utils.logging_config import get_main_logger
 
 
 def main() -> None:
     """
     Run all data pipelines using OOP approach.
     """
-    print("=== Energy Analytics Data Pipelines (OOP) ===")
-    print("Running all pipelines sequentially...\n")
+    # Setup main logger
+    logger = get_main_logger()
+    
+    logger.info("=== Energy Analytics Data Pipelines (OOP) ===")
+    logger.info("Running all pipelines sequentially...")
     
     try:
         # Run consumption pipeline
-        print("1. Starting Consumption Pipeline...")
-        consumption_pipeline = ConsumptionPipeline()
+        logger.info("1. Starting Consumption Pipeline...")
+        consumption_pipeline = ConsumptionPipeline(logger)
         consumption_pipeline.run_full_pipeline()
-        print("SUCCESS: Consumption pipeline completed\n")
+        logger.info("SUCCESS: Consumption pipeline completed")
         
         # Run stations pipeline
-        print("2. Starting Stations Pipeline...")
-        stations_pipeline = StationsPipeline()
+        logger.info("2. Starting Stations Pipeline...")
+        stations_pipeline = StationsPipeline(logger)
         stations_pipeline.run_full_pipeline()
-        print("SUCCESS: Stations pipeline completed\n")
+        logger.info("SUCCESS: Stations pipeline completed")
         
-        print("=== All pipelines completed successfully! ===")
+        logger.info("=== All pipelines completed successfully! ===")
         
     except Exception as e:
-        print(f"ERROR: Pipeline execution failed: {e}")
+        logger.error(f"Pipeline execution failed: {e}")
         sys.exit(1)
 
 

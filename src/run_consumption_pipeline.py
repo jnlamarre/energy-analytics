@@ -13,22 +13,26 @@ import os
 sys.path.append(os.path.dirname(__file__))
 
 from pipelines.consumption_pipeline import ConsumptionPipeline
+from utils.logging_config import get_pipeline_logger
 
 
 def main() -> None:
     """
     Run the consumption data pipeline using OOP approach.
     """
-    print("=== Energy Consumption Data Pipeline (OOP) ===")
+    # Setup pipeline logger
+    logger = get_pipeline_logger('consumption')
     
-    # Create pipeline instance
-    pipeline = ConsumptionPipeline()
+    logger.info("=== Energy Consumption Data Pipeline (OOP) ===")
+    
+    # Create pipeline instance with logger
+    pipeline = ConsumptionPipeline(logger)
     
     # Run the complete pipeline
     # This will: fetch -> process -> store -> load to database
     pipeline.run_full_pipeline()
     
-    print("=== Pipeline completed successfully! ===")
+    logger.info("=== Pipeline completed successfully! ===")
 
 
 if __name__ == "__main__":

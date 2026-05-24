@@ -1,5 +1,6 @@
 from typing import Optional
 import duckdb
+import logging
 
 try:
     from ..utils.pipeline_classes import BasePipeline, BaseProcessor, BaseStorage
@@ -19,8 +20,8 @@ class StationsProcessor(BaseProcessor):
     Processor for fuel station data with coordinate processing.
     """
     
-    def __init__(self):
-        super().__init__('stations')
+    def __init__(self, logger: Optional[logging.Logger] = None):
+        super().__init__('stations', logger)
     
     def process(self, data: list[dict]) -> list[dict]:
         """
@@ -40,8 +41,8 @@ class StationsStorage(BaseStorage):
     Storage handler for fuel station data.
     """
     
-    def __init__(self):
-        super().__init__('stations')
+    def __init__(self, logger: Optional[logging.Logger] = None):
+        super().__init__('stations', logger)
     
     def create_table(self, conn: duckdb.DuckDBPyConnection) -> None:
         """
@@ -100,7 +101,7 @@ class StationsStorage(BaseStorage):
         if not os.path.exists(data_file_path):
             raise FileNotFoundError(f"Data file not found: {data_file_path}")
             
-        print(f"Loading station data from {data_file_path}...")
+        self.logger.info(f"Loading station data from {data_file_path}...")
         
         # Check if data file has content before attempting bulk import
         import json
@@ -108,10 +109,10 @@ class StationsStorage(BaseStorage):
             with open(data_file_path, 'r', encoding='utf-8') as f:
                 data_content = json.load(f)
                 if not data_content:
-                    print("Warning: No data to import (empty JSON file)")
+                    self.logger.warning("No data to import (empty JSON file)")
                     return 0
         except (json.JSONDecodeError, FileNotFoundError, UnicodeDecodeError):
-            print("Error: Cannot read data file or file is corrupted")
+            self.logger.error("Cannot read data file or file is corrupted")
             return 0
         
         # Bulk import with field mapping from French to English names
@@ -144,7 +145,7 @@ class StationsStorage(BaseStorage):
         
         # Get count of records in table
         count = conn.execute("SELECT COUNT(*) FROM stations").fetchone()[0]
-        print(f"Loaded {count} station records")
+        self.logger.info(f"Loaded {count} station records")
         return count
 
 
@@ -154,10 +155,10 @@ class StationsPipeline(BasePipeline):
     Handles fetching from API, processing, and storage.
     """
     
-    def __init__(self):
-        super().__init__('stations')
-        self.processor = StationsProcessor()
-        self.storage = StationsStorage()
+    def __init__(self, logger: Optional[logging.Logger] = None):
+        super().__init__('stations', logger)
+        self.processor = StationsProcessor(logger)
+        self.storage = StationsStorage(logger)
     
     def fetch(self, **kwargs) -> list[dict]:
         """
@@ -169,7 +170,7 @@ class StationsPipeline(BasePipeline):
         Returns:
             List of fuel station records
         """
-        print("Fetching station data...")
+        self.logger.info("Fetching station data...")
         
         # Get configuration
         config = ConfigurationManager.get_configuration_by_table('stations')
@@ -181,7 +182,7 @@ class StationsPipeline(BasePipeline):
         url_template = config.url.replace('{step}', '{limit}')
         
         data = fetch_paginated_api(url_template, limit=100, max_records=10000)
-        print(f"Total stations fetched: {len(data)}")
+        self.logger.info(f"Total stations fetched: {len(data)}")
         
         return data
     
