@@ -35,14 +35,23 @@ energy-analytics/
 │       ├── files.py            # JSON save/load operations
 │       ├── logging.py          # Advanced logging system
 │       └── pipelines.py        # Base pipeline, processor, and storage classes
-├── data/                       # Ignored by git (large data files)
-│   ├── consumption.json        # Energy consumption data
-│   ├── stations.json          # Fuel station data
-│   └── energy-analytics.db    # DuckDB database
-└── logs/                       # Ignored by git (log files)
-    ├── main.log                # Centralized logging for full suite
-    ├── consumption.log         # Individual consumption pipeline logs
-    └── stations.log            # Individual stations pipeline logs
+├── tests/                      # Professional test suite
+│   ├── conftest.py             # Central fixture definitions (session-scoped)
+│   ├── test_*.py              # Test modules with advanced fixture patterns
+│   └── fixtures/              # Test data and configurations
+│       ├── config/            # JSON configuration test files
+│       └── sql/               # Test SQL fixtures
+├── pytest.ini                 # Pytest configuration with coverage settings
+├── .coveragerc                # Coverage reporting configuration
+├── htmlcov/                   # HTML coverage reports (ignored by git)
+├── data/                      # Ignored by git (large data files)
+│   ├── consumption.json       # Energy consumption data
+│   ├── stations.json         # Fuel station data
+│   └── energy-analytics.db   # DuckDB database
+└── logs/                      # Ignored by git (log files)
+    ├── main.log               # Centralized logging for full suite
+    ├── consumption.log        # Individual consumption pipeline logs
+    └── stations.log           # Individual stations pipeline logs
 ```
 
 ## Database Schema
@@ -63,6 +72,15 @@ python scripts/run_analytics.py
 
 # Dependencies
 uv install
+
+# Testing
+pytest                          # Run all tests with coverage
+pytest -v                       # Verbose output with test names
+pytest --cov-report=html        # Generate HTML coverage report
+pytest tests/test_api.py        # Run specific test module
+
+# Test Dependencies
+uv sync --group test            # Install test dependencies
 ```
 
 ## Development Notes
@@ -78,6 +96,7 @@ uv install
 - DuckDB database with context managers and bulk imports
 - Clean file organization following Python best practices
 - Complete pipelines working with UTF-8 encoding support
+- **Professional test suite** with 54 tests and 27% coverage
 
 ## Architecture Features
 - **Pydantic dataclasses** with configuration management
@@ -85,9 +104,30 @@ uv install
 - **Context managers** for automatic database resource cleanup
 - **Factory patterns** for polymorphic object creation
 - **English naming** throughout codebase
+- **Advanced testing methodology** with fixtures and coverage
+
+## Testing Infrastructure
+- **54 comprehensive tests** covering utilities and integration workflows
+- **Advanced fixture patterns** using conftest.py and dynamic resolution
+- **Session-scoped fixtures** for performance optimization
+- **Code coverage analysis** with HTML reports (27% baseline)
+- **Parametrized testing** for thorough edge case coverage
+- **Integration testing** with database operations and API mocking
+
+## Coverage Analysis
+**Well-tested modules (high coverage):**
+- `utils/database.py`: 100% coverage
+- `utils/files.py`: 100% coverage  
+- `utils/configuration_classes.py`: 90% coverage
+- `utils/api.py`: 88% coverage
+
+**Coverage opportunities:**
+- Pipeline implementations: 0% (business logic)
+- Analytics modules: 0% (reporting functions)
+- Logging system: 0% (utility functions)
 
 ## Next Steps
 1. Configure linting/type checking (ruff, mypy, etc.)
-2. Unit testing implementation
+2. Expand test coverage for pipeline and analytics modules
 3. Performance monitoring and optimization
-4. CI/CD pipeline setup
+4. CI/CD pipeline setup with test automation

@@ -1,0 +1,10 @@
+[
+  {
+    "api_type": "economie_gouv",
+    "dataset": "test_dataset",
+    "target_file": "test_target.json",
+    "sql_file": "fixtures/sql/test_stations.sql",
+    "table_name": "test_stations",
+    "select": ["id", "latitude", "longitude"]
+  }
+]

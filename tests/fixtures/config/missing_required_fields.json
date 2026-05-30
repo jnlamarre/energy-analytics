@@ -1,0 +1,8 @@
+[
+  {
+    "api_type": "data_gouv",
+    "target_file": "test_target.json",
+    "sql_file": "test.sql",
+    "table_name": "test_table"
+  }
+]

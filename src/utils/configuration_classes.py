@@ -169,11 +169,17 @@ class ConfigurationManager:
         Load SQL content from file.
         
         Args:
-            sql_filename: Name of the SQL file
+            sql_filename: Name of the SQL file or relative path from project root
             
         Returns:
             SQL content as string
         """
-        sql_path = os.path.join(os.path.dirname(__file__), '..', '..', 'sql', sql_filename)
+        # Check if it's a fixture path (contains 'fixtures/')
+        if 'fixtures/' in sql_filename:
+            sql_path = os.path.join(os.path.dirname(__file__), '..', '..', 'tests', sql_filename)
+        else:
+            # Standard production SQL file
+            sql_path = os.path.join(os.path.dirname(__file__), '..', '..', 'sql', sql_filename)
+        
         with open(sql_path, 'r', encoding='utf-8') as f:
             return f.read()

@@ -1,0 +1,14 @@
+[run]
+source = src
+
+[report]
+show_missing = True
+skip_empty = True
+omit = 
+    */tests/*
+    */test_*
+    */conftest.py
+    */__init__.py
+
+[html]
+directory = htmlcov

@@ -1,0 +1,9 @@
+[
+  {
+    "api_type": "data_gouv", 
+    "dataset": "test_dataset_id",
+    "target_file": "test_target.json",
+    "sql_file": "fixtures/sql/test_consumption.sql",
+    "table_name": "test_consumption"
+  }
+]

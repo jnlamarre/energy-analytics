@@ -1,0 +1,17 @@
+[
+  {
+    "api_type": "economie_gouv",
+    "dataset": "test_stations_dataset",
+    "target_file": "test_stations.json",
+    "sql_file": "fixtures/sql/test_stations.sql",
+    "table_name": "test_stations",
+    "select": ["id", "latitude"]
+  },
+  {
+    "api_type": "data_gouv", 
+    "dataset": "test_consumption_dataset",
+    "target_file": "test_consumption.json",
+    "sql_file": "fixtures/sql/test_consumption.sql",
+    "table_name": "test_consumption"
+  }
+]

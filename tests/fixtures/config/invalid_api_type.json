@@ -1,0 +1,9 @@
+[
+  {
+    "api_type": "unknown_api",
+    "dataset": "test_dataset",
+    "target_file": "test_target.json",
+    "sql_file": "fixtures/sql/test_consumption.sql",
+    "table_name": "test_table"
+  }
+]
