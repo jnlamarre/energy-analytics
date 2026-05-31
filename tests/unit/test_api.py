@@ -97,3 +97,42 @@ class TestApi:
             # Verify URL was formatted correctly
             expected_url = config.url.format(step=10, offset=0)
             mock_get.assert_called_with(expected_url)
+
+    def test_fetch_with_pagination_no_links(self):
+        """Test pagination when response has no links section."""
+        mock_response = Mock()
+        mock_response.json.return_value = {"data": [{"id": 1}]}  # No 'links' key
+        mock_response.raise_for_status.return_value = None
+        
+        with patch('requests.get') as mock_get:
+            mock_get.return_value = mock_response
+            
+            result = fetch_with_pagination('http://api.test')
+            
+            assert len(result) == 1
+            assert result[0]['id'] == 1
+
+    def test_fetch_paginated_api_no_results(self):
+        """Test paginated API when response has empty results."""
+        mock_response = Mock()
+        mock_response.json.return_value = {"results": [], "total_count": 0}  # Empty results
+        mock_response.raise_for_status.return_value = None
+        
+        with patch('requests.get') as mock_get:
+            mock_get.return_value = mock_response
+            
+            result = fetch_paginated_api('http://api.test?limit={limit}&offset={offset}')
+            
+            assert len(result) == 0
+
+    def test_fetch_paginated_api_exception_handling(self):
+        """Test that fetch_paginated_api handles RequestException properly."""
+        with patch('requests.get') as mock_get:
+            mock_get.side_effect = requests.RequestException("Network error")
+            
+            result = fetch_paginated_api('http://api.test?limit={limit}&offset={offset}')
+            
+            # Should return empty list when exception occurs
+            assert len(result) == 0
+            # Should have made only one call before breaking
+            mock_get.assert_called_once()

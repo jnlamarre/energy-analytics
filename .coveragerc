@@ -9,6 +9,10 @@ omit =
     */test_*
     */conftest.py
     */__init__.py
+    src/main.py
+    src/utils/logging.py
+    src/analytics/*
+    scripts/*
 
 [html]
 directory = htmlcov

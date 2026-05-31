@@ -48,6 +48,50 @@ class TestDatabase:
             if os.path.exists(temp_db_path):
                 os.unlink(temp_db_path)
 
+    def test_path_resolution_project_root_scenario(self):
+        """Test path resolution when running from project root."""
+        temp_dir = tempfile.gettempdir()
+        temp_db_path = os.path.join(temp_dir, f"test_root_{os.getpid()}.db")
+        
+        try:
+            # Mock scenario: both 'data' and 'config.json' exist (project root)
+            with patch('os.path.exists') as mock_exists:
+                def exists_side_effect(path):
+                    return path in ['data', 'config.json']
+                mock_exists.side_effect = exists_side_effect
+                
+                # Test relative path in project root
+                db_conn = DuckDBConnection(temp_db_path)
+                assert db_conn.db_path == temp_db_path
+                
+                # Test path with ../ prefix in project root  
+                db_conn_with_prefix = DuckDBConnection(f"../{temp_db_path}")
+                expected_path = temp_db_path  # ../ should be removed
+                assert db_conn_with_prefix.db_path == expected_path
+                
+        finally:
+            if os.path.exists(temp_db_path):
+                os.unlink(temp_db_path)
+
+    def test_path_resolution_src_directory_scenario(self):
+        """Test path resolution when running from src/ directory."""
+        relative_db_path = "data/test_src.db"
+        
+        # Mock scenario: neither 'data' nor 'config.json' exist (in src/)
+        with patch('os.path.exists') as mock_exists, \
+             patch('os.path.isabs') as mock_isabs:
+            mock_exists.return_value = False
+            mock_isabs.return_value = False  # Ensure it's treated as relative
+            
+            # Test relative path in src directory - should add ../
+            db_conn = DuckDBConnection(relative_db_path)
+            assert db_conn.db_path == f"../{relative_db_path}"
+            
+            # Test path that already has ../ prefix - should remain unchanged
+            already_prefixed = f"../{relative_db_path}"
+            db_conn_with_prefix = DuckDBConnection(already_prefixed)
+            assert db_conn_with_prefix.db_path == already_prefixed
+
     def test_execute_query_function(self):
         """Test standalone execute_query function."""
         temp_dir = tempfile.gettempdir()

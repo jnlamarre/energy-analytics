@@ -67,6 +67,10 @@ logs/
 *.ipynb_checkpoints/
 .ipynb_checkpoints/
 
+# Test coverage reports
+.coverage
+htmlcov/
+
 # Data analysis outputs
 *.csv
 *.xlsx

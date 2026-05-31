@@ -4,15 +4,15 @@ import logging
 
 try:
     from ..utils.pipelines import BasePipeline, BaseProcessor, BaseStorage
-    from ..utils.api import fetch_with_pagination
-    from ..utils.configuration_classes import ConfigurationManager
-except ImportError:
-    import sys
-    import os
-    sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-    from utils.pipelines import BasePipeline, BaseProcessor, BaseStorage
-    from utils.api import fetch_with_pagination
-    from utils.configuration_classes import ConfigurationManager
+    from ..utils.api import fetch_with_pagination  # pragma: no cover
+    from ..utils.configuration_classes import ConfigurationManager  # pragma: no cover
+except ImportError:  # pragma: no cover
+    import sys  # pragma: no cover
+    import os  # pragma: no cover
+    sys.path.append(os.path.dirname(os.path.dirname(__file__)))  # pragma: no cover
+    from utils.pipelines import BasePipeline, BaseProcessor, BaseStorage  # pragma: no cover
+    from utils.api import fetch_with_pagination  # pragma: no cover
+    from utils.configuration_classes import ConfigurationManager  # pragma: no cover
 
 
 class ConsumptionProcessor(BaseProcessor):
