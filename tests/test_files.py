@@ -114,3 +114,76 @@ def test_save_load_round_trip():
     finally:
         if os.path.exists(temp_path):
             os.unlink(temp_path)
+
+
+class TestFilesEnhanced:
+    """Enhanced file operation tests with comprehensive validation."""
+
+    def test_file_content_validation_comprehensive(self):
+        """Test comprehensive file content validation with various data types."""
+        test_data = [
+            {"id": 1, "name": "Alice", "score": 95.5, "active": True},
+            {"id": 2, "name": "Bob", "score": 87.2, "active": False},
+            {"id": 3, "name": "Charlie", "score": 92.8, "active": True}
+        ]
+        
+        with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.json') as temp_file:
+            temp_path = temp_file.name
+        
+        try:
+            # Save and verify file properties
+            save_json(test_data, temp_path)
+            assert os.path.exists(temp_path)
+            assert os.path.getsize(temp_path) > 0
+            
+            # Verify raw content contains expected elements
+            with open(temp_path, 'r', encoding='utf-8') as f:
+                raw_content = f.read()
+                assert '"id": 1' in raw_content
+                assert '"name": "Alice"' in raw_content
+                assert '"score": 95.5' in raw_content
+                assert '"active": true' in raw_content
+            
+            # Load and verify complete data integrity
+            loaded_data = load_json(temp_path)
+            assert loaded_data == test_data
+            assert len(loaded_data) == 3
+            
+            # Verify specific field values with proper type checking
+            assert loaded_data[0]["name"] == "Alice"
+            assert loaded_data[1]["score"] == 87.2
+            assert loaded_data[2]["active"] is True
+            
+        finally:
+            if os.path.exists(temp_path):
+                os.unlink(temp_path)
+
+    def test_unicode_encoding_handling(self):
+        """Test proper Unicode character encoding and preservation."""
+        unicode_data = [
+            {"name": "café", "city": "São Paulo", "description": "été"},
+            {"symbols": "🚀 📊 ⚡", "mixed": "ASCII + français + 🌟"}
+        ]
+        
+        with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.json') as temp_file:
+            temp_path = temp_file.name
+        
+        try:
+            # Save and load Unicode data
+            save_json(unicode_data, temp_path)
+            
+            # Verify file can be read with UTF-8 encoding
+            with open(temp_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+                assert "café" in content
+                assert "São Paulo" in content
+                assert "été" in content
+                assert "🚀" in content
+            
+            # Verify data integrity through load operation
+            loaded_data = load_json(temp_path)
+            assert loaded_data == unicode_data
+            
+        finally:
+            if os.path.exists(temp_path):
+                os.unlink(temp_path)

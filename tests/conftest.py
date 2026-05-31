@@ -8,6 +8,97 @@ from utils.configuration_classes import ConfigurationManager, DataGouvConfigurat
 
 # ===== CONFIGURATION FIXTURES =====
 
+# ===== CONFIGURATION INPUT FIXTURES FOR OBJECT TESTING =====
+
+@pytest.fixture(scope="session")
+def valid_economie_gouv_input():
+    """Input dictionary for valid EconomieGouvConfiguration object creation."""
+    return {
+        "api_type": "economie_gouv",
+        "dataset": "test_dataset",
+        "target_file": "test_target.json",
+        "sql_file": "fixtures/sql/test_stations.sql",
+        "sql_creation": "SELECT 1",
+        "table_name": "test_stations",
+        "select": ["id", "name"]
+    }
+
+
+@pytest.fixture(scope="session")
+def valid_data_gouv_input():
+    """Input dictionary for valid DataGouvConfiguration object creation."""
+    return {
+        "api_type": "data_gouv",
+        "dataset": "test_dataset_id",
+        "target_file": "test_target.json",
+        "sql_file": "fixtures/sql/test_consumption.sql",
+        "sql_creation": "SELECT 1",
+        "table_name": "test_consumption"
+    }
+
+
+@pytest.fixture
+def economie_gouv_missing_required():
+    """Input dictionary missing required fields for ValidationError testing."""
+    return {
+        "api_type": "economie_gouv",
+        "dataset": "test_dataset"
+        # Missing: target_file, sql_file, sql_creation, table_name, select
+    }
+
+
+@pytest.fixture  
+def data_gouv_missing_required():
+    """Input dictionary missing required fields for ValidationError testing."""
+    return {
+        "api_type": "data_gouv",
+        "dataset": "test_dataset"
+        # Missing: target_file, sql_file, sql_creation, table_name
+    }
+
+
+@pytest.fixture
+def economie_gouv_invalid_api_type():
+    """Input dictionary with invalid api_type for ValidationError testing."""
+    return {
+        "api_type": "invalid_type",
+        "dataset": "test_dataset",
+        "target_file": "test_target.json",
+        "sql_file": "fixtures/sql/test_stations.sql", 
+        "sql_creation": "SELECT 1",
+        "table_name": "test_stations",
+        "select": ["id"]
+    }
+
+
+@pytest.fixture
+def data_gouv_invalid_api_type():
+    """Input dictionary with invalid api_type for ValidationError testing."""
+    return {
+        "api_type": "invalid_type", 
+        "dataset": "test_dataset",
+        "target_file": "test_target.json",
+        "sql_file": "fixtures/sql/test_consumption.sql",
+        "sql_creation": "SELECT 1", 
+        "table_name": "test_consumption"
+    }
+
+
+@pytest.fixture
+def economie_gouv_with_select(valid_economie_gouv_input):
+    """EconomieGouvConfiguration with select fields for URL testing."""
+    input_data = valid_economie_gouv_input.copy()
+    input_data["select"] = ["id", "name"]
+    return EconomieGouvConfiguration(**input_data)
+
+
+@pytest.fixture
+def economie_gouv_empty_select(valid_economie_gouv_input):
+    """EconomieGouvConfiguration with empty select list for URL testing."""
+    input_data = valid_economie_gouv_input.copy()
+    input_data["select"] = []
+    return EconomieGouvConfiguration(**input_data)
+
 @pytest.fixture(scope="session")
 def valid_economie_gouv_config():
     """Single EconomieGouvConfiguration object for testing. Session-scoped for performance."""
@@ -135,6 +226,76 @@ def any_config(any_api_type, config_factory):
 
 
 # ===== DATABASE FIXTURES =====
+
+# ===== DATABASE TEST DATA FIXTURES =====
+
+@pytest.fixture
+def test_json_data(tmp_path):
+    """Create temporary JSON file with test data for database loading tests."""
+    from utils.files import save_json
+    
+    test_data = [
+        {"id": 1, "consumption": 100.5, "date": "2024-01-01"},
+        {"id": 2, "consumption": 200.3, "date": "2024-01-02"},
+        {"id": 3, "consumption": 150.7, "date": "2024-01-03"}
+    ]
+    
+    json_file = tmp_path / "test_data.json"
+    save_json(test_data, str(json_file))
+    return str(json_file)
+
+
+@pytest.fixture
+def stations_test_json_data(tmp_path):
+    """Create temporary JSON file with stations test data for database loading tests."""
+    from utils.files import save_json
+    
+    stations_data = [
+        {"id": 1, "latitude": 48.8566, "longitude": 2.3522, "ville": "Paris"},
+        {"id": 2, "latitude": 45.7640, "longitude": 4.8357, "ville": "Lyon"},
+        {"id": 3, "latitude": 43.2965, "longitude": 5.3698, "ville": "Marseille"}
+    ]
+    
+    json_file = tmp_path / "test_stations.json"
+    save_json(stations_data, str(json_file))
+    return str(json_file)
+
+
+@pytest.fixture
+def invalid_json_data(tmp_path):
+    """Create temporary file with invalid JSON for error testing."""
+    invalid_file = tmp_path / "invalid.json"
+    invalid_file.write_text('{"invalid": json content')  # Missing closing brace
+    return str(invalid_file)
+
+
+@pytest.fixture
+def empty_json_data(tmp_path):
+    """Create temporary JSON file with empty array for edge case testing."""
+    from utils.files import save_json
+    
+    json_file = tmp_path / "empty_data.json"
+    save_json([], str(json_file))
+    return str(json_file)
+
+
+@pytest.fixture 
+def database_operation_test_data():
+    """Fixture providing test data scenarios for database operations."""
+    return {
+        "consumption_table": {
+            "sql": "CREATE TABLE IF NOT EXISTS test_consumption (id INTEGER, consumption REAL, date TEXT)",
+            "table_name": "test_consumption",
+            "expected_count": 3,
+            "expected_data": [(1, 100.5, "2024-01-01"), (2, 200.3, "2024-01-02"), (3, 150.7, "2024-01-03")]
+        },
+        "stations_table": {
+            "sql": "CREATE TABLE IF NOT EXISTS test_stations (id INTEGER, latitude REAL, longitude REAL, ville TEXT)",
+            "table_name": "test_stations", 
+            "expected_count": 3,
+            "expected_data": [(1, 48.8566, 2.3522, "Paris"), (2, 45.7640, 4.8357, "Lyon"), (3, 43.2965, 5.3698, "Marseille")]
+        }
+    }
 
 @pytest.fixture
 def temp_database():

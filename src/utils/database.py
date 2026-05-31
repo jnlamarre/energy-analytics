@@ -8,7 +8,10 @@ class DuckDBConnection:
     
     def __init__(self, db_path: str = 'data/energy-analytics.db'):
         # Auto-detect correct path based on working directory
-        if os.path.exists('data') and os.path.exists('config.json'):
+        if os.path.isabs(db_path):
+            # Absolute path - use as-is
+            self.db_path = db_path
+        elif os.path.exists('data') and os.path.exists('config.json'):
             # Running from project root (has both data and config.json)
             self.db_path = db_path if not db_path.startswith('../') else db_path.replace('../', '')
         else:
