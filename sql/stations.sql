@@ -7,15 +7,15 @@ CREATE TABLE stations (
     city VARCHAR(100),
     services_json TEXT,
     hours_json TEXT,
-    
+
     -- Diesel (Gazole)
     gazole_price DECIMAL(5,3),
     gazole_updated TIMESTAMPTZ,
-    
+
     -- SP95
     sp95_price DECIMAL(5,3),
     sp95_updated TIMESTAMPTZ,
-    
+
     -- SP98
     sp98_price DECIMAL(5,3),
     sp98_updated TIMESTAMPTZ

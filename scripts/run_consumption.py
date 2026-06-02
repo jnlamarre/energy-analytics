@@ -6,11 +6,11 @@ This script demonstrates the new object-oriented pipeline architecture.
 Fetches energy consumption data and loads it into DuckDB using pipeline classes.
 """
 
-import sys
 import os
+import sys
 
 # Add src directory to Python path for imports
-sys.path.append(os.path.join(os.path.dirname(__file__), '../src'))
+sys.path.append(os.path.join(os.path.dirname(__file__), "../src"))
 
 from pipelines.consumption import ConsumptionPipeline
 from utils.logging import get_pipeline_logger
@@ -22,24 +22,25 @@ def main() -> None:
     """
     try:
         # Setup pipeline logger
-        logger = get_pipeline_logger('consumption')
-        
+        logger = get_pipeline_logger("consumption")
+
         logger.info("=== Energy Consumption Data Pipeline (OOP) ===")
         print("Starting consumption pipeline...")
-        
+
         # Create pipeline instance with logger
         pipeline = ConsumptionPipeline(logger)
-        
+
         # Run the complete pipeline
         # This will: fetch -> process -> store -> load to database
         pipeline.run_full_pipeline()
-        
+
         logger.info("=== Pipeline completed successfully! ===")
         print("Pipeline completed successfully!")
-        
+
     except Exception as e:
         print(f"Pipeline failed: {e}")
         import traceback
+
         traceback.print_exc()
 
 

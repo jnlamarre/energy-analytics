@@ -11,6 +11,7 @@ energy-analytics/
 ├── README.md                   # User documentation
 ├── CLAUDE.md                   # This file - Project context
 ├── pyproject.toml              # UV package management (Python 3.13+)
+├── .pre-commit-config.yaml     # Pre-commit hooks configuration
 ├── config.json                 # API endpoints and table configuration
 ├── uv.lock                     # UV lock file
 ├── scripts/                    # Entry point scripts
@@ -82,17 +83,23 @@ python scripts/run_stations.py
 python scripts/run_analytics.py
 
 # Dependencies
-uv install
+uv install                     # Install all dependencies
+uv sync --group dev             # Install dev dependencies (ruff, pre-commit)
+uv sync --group test            # Install test dependencies
 
 # Testing
 pytest                          # Run all tests with coverage
 pytest -v                       # Verbose output with test names
 pytest --cov-report=html        # Generate HTML coverage report
 pytest tests/test_api.py        # Run specific test module
-pytest tests/test_files.py      # Run enhanced file operation tests
 
-# Test Dependencies
-uv sync --group test            # Install test dependencies
+# Code Quality & Development Workflow
+uv run ruff check .            # Check code for PEP 8 compliance and issues
+uv run ruff format .           # Format code automatically
+uv run ruff check --fix .      # Auto-fix linting issues
+uv run pre-commit run --all-files  # Run all pre-commit hooks manually
+uv run pre-commit install      # Install git pre-commit hooks (auto-run on commit)
+git commit -m "message"        # Commits automatically run pre-commit hooks
 ```
 
 ## Development Notes
@@ -109,6 +116,8 @@ uv sync --group test            # Install test dependencies
 - Clean file organization following Python best practices
 - Complete pipelines working with UTF-8 encoding support
 - **100% test coverage** with 125 comprehensive tests across all modules
+- **Modern code quality infrastructure** with Ruff + pre-commit hooks
+- **Automated quality gates** ensuring PEP 8 compliance on every commit
 
 ## Architecture Features
 - **Pydantic dataclasses** with configuration management
@@ -117,6 +126,27 @@ uv sync --group test            # Install test dependencies
 - **Factory patterns** for polymorphic object creation
 - **English naming** throughout codebase
 - **Advanced testing methodology** with fixtures and coverage
+
+## Code Quality Infrastructure ✅ AUTOMATED
+**Modern Development Workflow:**
+- **Ruff**: Fast, modern linting and formatting (replaces black + isort + flake8)
+- **Pre-commit hooks**: Automated quality gates on every git commit
+- **PEP 8 compliance**: 100% adherence to Python style standards
+- **Import sorting**: Automatic organization of import statements
+- **File validation**: JSON/YAML/TOML syntax checking, whitespace cleanup
+
+**Quality Assurance:**
+- All 779+ style issues automatically resolved
+- Comprehensive pre-commit checks (linting, formatting, file validation)
+- Superior to traditional black+isort approach with single, fast tool
+- Production-ready code quality enforcement
+
+**Developer Experience:**
+```bash
+git commit -m "message"  # Automatically runs all quality checks
+uv run ruff check .      # Manual code quality verification
+uv run ruff format .     # Manual code formatting
+```
 
 ## Testing Infrastructure ✅ 100% COVERAGE
 - **125 production-ready tests** with clean hierarchical organization

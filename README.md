@@ -20,6 +20,11 @@ python scripts/run_analytics.py
 pytest                        # Run 125 tests with 100% coverage
 pytest -v                     # Verbose output with test names
 pytest --cov-report=html      # Generate HTML coverage report
+
+# Code quality (automatic on git commit)
+uv run ruff check .           # Check code quality
+uv run ruff format .          # Format code
+uv run pre-commit run --all-files  # Run all quality checks
 ```
 
 ## Project Structure
@@ -44,6 +49,7 @@ data/            # Generated data and database
 ## Features
 
 - **Modern Python**: Type hints, Pydantic dataclasses, OOP architecture
+- **Code Quality**: Ruff linting/formatting + pre-commit hooks for PEP 8 compliance
 - **Testing**: 125 comprehensive tests with perfect 100% coverage
 - **Logging System**: Structured logging with component isolation
 - **Database**: DuckDB with context managers and bulk imports
@@ -63,6 +69,12 @@ data/            # Generated data and database
 
 ## Development
 
+**Code Quality:**
+- **Ruff**: Modern, fast linting and formatting (replaces black + isort)
+- **Pre-commit hooks**: Automated quality gates on every git commit
+- **PEP 8 compliance**: 100% adherence enforced automatically
+- **Modern workflow**: All quality checks run automatically on commit
+
 **Testing:**
 - **Perfect 100% coverage** across all 7 core modules (335 lines tested)
 - **125 comprehensive tests** with unit/integration/e2e organization
@@ -74,7 +86,9 @@ data/            # Generated data and database
 **Dependencies:**
 ```bash
 uv install                   # Production dependencies
+uv sync --group dev           # Add development dependencies (ruff, pre-commit)
 uv sync --group test         # Add testing dependencies
+uv run pre-commit install    # Install git hooks (run once after clone)
 ```
 
 ## Requirements

@@ -1,35 +1,41 @@
-from typing import Optional
-import duckdb
 import logging
+from typing import Optional
+
+import duckdb
 
 try:
-    from ..utils.pipelines import BasePipeline, BaseProcessor, BaseStorage
     from ..utils.api import fetch_with_pagination  # pragma: no cover
     from ..utils.configuration_classes import ConfigurationManager  # pragma: no cover
+    from ..utils.pipelines import BasePipeline, BaseProcessor, BaseStorage
 except ImportError:  # pragma: no cover
-    import sys  # pragma: no cover
     import os  # pragma: no cover
+    import sys  # pragma: no cover
+
     sys.path.append(os.path.dirname(os.path.dirname(__file__)))  # pragma: no cover
-    from utils.pipelines import BasePipeline, BaseProcessor, BaseStorage  # pragma: no cover
     from utils.api import fetch_with_pagination  # pragma: no cover
     from utils.configuration_classes import ConfigurationManager  # pragma: no cover
+    from utils.pipelines import (  # pragma: no cover
+        BasePipeline,
+        BaseProcessor,
+        BaseStorage,
+    )
 
 
 class ConsumptionProcessor(BaseProcessor):
     """
     Processor for energy consumption data.
     """
-    
+
     def __init__(self, logger: Optional[logging.Logger] = None):
-        super().__init__('consumption', logger)
-    
+        super().__init__("consumption", logger)
+
     def process(self, data: list[dict]) -> list[dict]:
         """
         Process consumption data (currently no transformation needed).
-        
+
         Args:
             data: Raw consumption data
-            
+
         Returns:
             Processed data (same as input for now)
         """
@@ -40,21 +46,21 @@ class ConsumptionStorage(BaseStorage):
     """
     Storage handler for consumption data.
     """
-    
+
     def __init__(self, logger: Optional[logging.Logger] = None):
-        super().__init__('consumption', logger)
-    
+        super().__init__("consumption", logger)
+
     def create_table(self, conn: duckdb.DuckDBPyConnection) -> None:
         """
         Create the energy consumption table with proper schema.
-        
+
         Args:
             conn: Database connection
         """
         conn.execute("DROP TABLE IF EXISTS consumption")
-        
+
         # Get SQL from config
-        config = self.config_manager.get_configuration_by_table('consumption')
+        config = self.config_manager.get_configuration_by_table("consumption")
         if config and config.sql_creation:
             conn.execute(config.sql_creation)
         else:
@@ -75,22 +81,22 @@ class ConsumptionStorage(BaseStorage):
                     gas_terega_consumption_mw INTEGER
                 )
             """)
-    
+
     def insert_data(self, conn: duckdb.DuckDBPyConnection, data_file_path: str) -> int:
         """
         Insert consumption data into database.
-        
+
         Args:
             conn: Database connection
             data_file_path: Path to JSON data file
-            
+
         Returns:
             Number of records inserted
         """
         # Insert data from JSON
         conn.execute(f"""
             INSERT INTO consumption
-            SELECT 
+            SELECT
                 "__id"::INTEGER as id,
                 CAST(Date AS DATE) as date,
                 Heure::STRING as time_slot,
@@ -106,7 +112,7 @@ class ConsumptionStorage(BaseStorage):
                 "Consommation brute gaz (MW PCS 0°C) - Teréga"::INTEGER as gas_terega_consumption_mw
             FROM read_json('{data_file_path}')
         """)
-        
+
         # Return count
         result = conn.execute("SELECT COUNT(*) as count FROM consumption").fetchone()
         return result[0] if result else 0
@@ -117,39 +123,45 @@ class ConsumptionPipeline(BasePipeline):
     Complete pipeline for energy consumption data.
     Handles fetching from API, processing, and storage.
     """
-    
+
     def __init__(self, logger: Optional[logging.Logger] = None):
-        super().__init__('consumption', logger)
+        super().__init__("consumption", logger)
         self.processor = ConsumptionProcessor(logger)
         self.storage = ConsumptionStorage(logger)
-    
-    def fetch(self, start_date: str | None = None, end_date: str | None = None, single_date: str | None = None, **kwargs) -> list[dict]:
+
+    def fetch(
+        self,
+        start_date: str | None = None,
+        end_date: str | None = None,
+        single_date: str | None = None,
+        **kwargs,
+    ) -> list[dict]:
         """
         Fetch energy consumption data from French government API.
-        
+
         Args:
             start_date: Start date for range (YYYY-MM-DD format)
             end_date: End date for range (YYYY-MM-DD format)
             single_date: Single specific date (YYYY-MM-DD format)
             **kwargs: Additional parameters (ignored)
-            
+
         Returns:
             List of consumption records
         """
         self.logger.info("Fetching consumption data...")
-        
+
         # Get configuration
-        config = ConfigurationManager.get_configuration_by_table('consumption')
+        config = ConfigurationManager.get_configuration_by_table("consumption")
         if not config:
             raise ValueError("No configuration found for consumption table")
-        
+
         # Get API URL from config property
         base_url = config.url
-        
+
         # Determine query parameters
         if single_date:
             # Single date query
-            params = {'Date__exact': f'"{single_date}"'}
+            params = {"Date__exact": f'"{single_date}"'}
             self.logger.info(f"Fetching data for single date: {single_date}")
         else:
             # Date range query
@@ -157,48 +169,47 @@ class ConsumptionPipeline(BasePipeline):
                 start_date = "2026-01-01"
             if not end_date:
                 end_date = "2026-03-31"
-                
-            params = {
-                'Date__greater': start_date,
-                'Date__less': end_date
-            }
-            self.logger.info(f"Fetching data for date range: {start_date} to {end_date}")
-        
+
+            params = {"Date__greater": start_date, "Date__less": end_date}
+            self.logger.info(
+                f"Fetching data for date range: {start_date} to {end_date}"
+            )
+
         try:
             data = fetch_with_pagination(base_url, params)
             self.logger.info(f"Total consumption records collected: {len(data)}")
             return data
-            
+
         except Exception as e:
             self.logger.error(f"Error fetching consumption data: {e}")
             return []
-    
+
     def process(self, data: list[dict]) -> list[dict]:
         """
         Process consumption data.
-        
+
         Args:
             data: Raw consumption data
-            
+
         Returns:
             Processed data
         """
         return self.processor.process(data)
-    
+
     def store(self, data: list[dict], file_path: str | None = None) -> None:
         """
         Store consumption data to JSON file.
-        
+
         Args:
             data: Processed data to store
             file_path: Optional custom file path
         """
         self.processor.save_to_file(data, file_path)
-    
-    def load_to_database(self, db_path: str = 'data/energy-analytics.db') -> None:
+
+    def load_to_database(self, db_path: str = "data/energy-analytics.db") -> None:
         """
         Load consumption data into database.
-        
+
         Args:
             db_path: Path to database file
         """

@@ -8,7 +8,7 @@
     "select": ["id", "latitude"]
   },
   {
-    "api_type": "data_gouv", 
+    "api_type": "data_gouv",
     "dataset": "test_consumption_dataset",
     "target_file": "test_consumption.json",
     "sql_file": "fixtures/sql/test_consumption.sql",

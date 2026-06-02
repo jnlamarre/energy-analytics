@@ -59,7 +59,7 @@ logs/
 .claude_history
 .claude_sessions
 
-# UV specific  
+# UV specific
 .venv/
 .env
 
@@ -83,3 +83,4 @@ outputs/
 
 # Claude Code IDE configuration
 .claude/
+.claudeignore

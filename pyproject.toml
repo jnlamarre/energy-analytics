@@ -11,8 +11,24 @@ dependencies = [
 ]
 
 [dependency-groups]
+dev = [
+    "pre-commit>=4.6.0",
+    "ruff>=0.15.15",
+]
 test = [
     "pytest>=9.0.3",
     "pytest-mock>=3.15.1",
     "pytest-cov>=6.0.0",
 ]
+
+[tool.ruff]
+line-length = 88
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]  # PEP 8 errors, pyflakes, warnings, import sorting
+ignore = ["E501"]  # Line too long (handled by formatter)
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
